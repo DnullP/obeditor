@@ -1,0 +1,73 @@
+{
+  "name": "obeditor",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "Generic React Markdown editor core extracted from ofive.",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/obeditor.css"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 4317 --strictPort",
+    "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json && vite build",
+    "prepare": "npm run build",
+    "test": "bun test",
+    "test:e2e": "bunx playwright test --config playwright.config.ts --reporter=line"
+  },
+  "dependencies": {
+    "lucide-react": "^0.564.0",
+    "react-markdown": "^10.1.0",
+    "remark-breaks": "^4.0.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "peerDependencies": {
+    "@codemirror/autocomplete": "^6.20.0",
+    "@codemirror/commands": "^6.10.0",
+    "@codemirror/lang-markdown": "^6.5.0",
+    "@codemirror/language": "^6.11.3",
+    "@codemirror/lint": "6.9.4",
+    "@codemirror/search": "^6.5.11",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "6.39.16",
+    "@lezer/highlight": "^1.2.3",
+    "codemirror": "^6.0.2",
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0"
+  },
+  "devDependencies": {
+    "@codemirror/autocomplete": "^6.20.0",
+    "@codemirror/commands": "^6.10.0",
+    "@codemirror/lang-markdown": "^6.5.0",
+    "@codemirror/language": "^6.11.3",
+    "@codemirror/lint": "6.9.4",
+    "@codemirror/search": "^6.5.11",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "6.39.16",
+    "@playwright/test": "^1.59.1",
+    "@types/bun": "^1.3.13",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^4.7.0",
+    "@lezer/highlight": "^1.2.3",
+    "codemirror": "^6.0.2",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "typescript": "~5.8.3",
+    "vite": "^7.3.2"
+  },
+  "overrides": {
+    "@codemirror/view": "6.39.16"
+  }
+}
