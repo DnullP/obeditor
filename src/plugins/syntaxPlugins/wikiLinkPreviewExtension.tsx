@@ -416,6 +416,9 @@ function WikiLinkPreviewCard(props: WikiLinkPreviewCardProps): ReactNode {
                     <WikiLinkPreviewParentContext.Provider value={props.previewId}>
                         <MarkdownReadView
                             content={props.data.content}
+                            currentFilePath={props.data.resolvedPath}
+                            capabilities={props.capabilities}
+                            initialRevealLine={props.data.revealLine ?? null}
                         />
                     </WikiLinkPreviewParentContext.Provider>
                 ) : null}

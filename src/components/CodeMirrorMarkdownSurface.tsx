@@ -4,7 +4,7 @@ import { indentWithTab } from "@codemirror/commands";
 import { EditorState, type Extension } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
 import { vim } from "@replit/codemirror-vim";
-import { editorBaseSetup } from "../core/editorBaseSetup";
+import { createEditorBaseSetup } from "../core/editorBaseSetup";
 import { createEditorThemeExtension } from "../core/codemirrorTheme";
 import { buildLineNumbersExtension } from "../core/lineNumbersModeExtension";
 import type { EditorService } from "../core/types";
@@ -75,7 +75,7 @@ export function CodeMirrorMarkdownSurface({
     const state = EditorState.create({
       doc: service.getSnapshot().document.content,
       extensions: [
-        editorBaseSetup,
+        createEditorBaseSetup({ drawSelection: !vimMode }),
         markdown(),
         createEditorThemeExtension(),
         EditorView.lineWrapping,

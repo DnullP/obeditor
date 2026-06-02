@@ -65,7 +65,13 @@ export type {
   EditorViewAttachOptions,
 } from "./core/types";
 export { createEditorService } from "./core/editorService";
-export { editorBaseSetup } from "./core/editorBaseSetup";
+export {
+  createEditorBaseSetup,
+  editorBaseSetup,
+} from "./core/editorBaseSetup";
+export type {
+  EditorBaseSetupOptions,
+} from "./core/editorBaseSetup";
 export { createEditorThemeExtension } from "./core/codemirrorTheme";
 export {
   focusEditorViewPreservingViewport,

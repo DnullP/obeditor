@@ -35,7 +35,14 @@ import {
 } from "@codemirror/autocomplete";
 import { lintKeymap } from "@codemirror/lint";
 
-export const editorBaseSetup: Extension = [
+export interface EditorBaseSetupOptions {
+  drawSelection?: boolean;
+}
+
+export function createEditorBaseSetup(options: EditorBaseSetupOptions = {}): Extension {
+  const shouldDrawSelection = options.drawSelection ?? true;
+
+  return [
   highlightActiveLineGutter(),
   highlightSpecialChars(),
   history(),
@@ -47,7 +54,7 @@ export const editorBaseSetup: Extension = [
   bracketMatching(),
   closeBrackets(),
   autocompletion(),
-  drawSelection(),
+  shouldDrawSelection ? drawSelection() : [],
   rectangularSelection(),
   crosshairCursor(),
   highlightActiveLine(),
@@ -61,4 +68,7 @@ export const editorBaseSetup: Extension = [
     ...completionKeymap,
     ...lintKeymap,
   ]),
-];
+  ];
+}
+
+export const editorBaseSetup: Extension = createEditorBaseSetup();

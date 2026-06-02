@@ -207,6 +207,11 @@ interface TableResizeDragState {
     startSize: number;
 }
 
+interface PendingTableResizeLayout {
+    columnWidths: number[];
+    rowHeights: number[];
+}
+
 const DEFAULT_TABLE_COLUMN_WIDTH = 164;
 const MIN_TABLE_COLUMN_WIDTH = 88;
 const MIN_TABLE_ROW_HEIGHT = MARKDOWN_TABLE_MIN_ROW_HEIGHT;
@@ -415,6 +420,14 @@ function buildMarkdownTableLayout(
     };
 }
 
+function areRowOffsetsEqual(left: readonly number[], right: readonly number[]): boolean {
+    if (left.length !== right.length) {
+        return false;
+    }
+
+    return left.every((offset, index) => Math.abs(offset - (right[index] ?? 0)) < 0.5);
+}
+
 function insertTableLayoutSize(values: number[], index: number, defaultValue: number): number[] {
     const safeIndex = Math.max(0, Math.min(index, values.length));
     const nextValues = [...values];
@@ -551,12 +564,15 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
     const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
     const navigationRefs = useRef<Map<string, HTMLDivElement>>(new Map());
     const headerMeasureRef = useRef<HTMLElement | null>(null);
+    const bodyMeasureRefs = useRef<Map<number, HTMLElement>>(new Map());
+    const rowEdgeRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
     const inputImeCompositionGuard = useRef(createImeCompositionGuard()).current;
     const isCommittingDraftRef = useRef<boolean>(false);
     const pendingInputSelectionRef = useRef<PendingInputSelection | null>(null);
     const wikiLinkSuggestRequestSeqRef = useRef<number>(0);
     const wikiLinkSuggestDebounceTimerRef = useRef<number | null>(null);
     const resizeDragStateRef = useRef<TableResizeDragState | null>(null);
+    const pendingResizeLayoutRef = useRef<PendingTableResizeLayout | null>(null);
     const pendingActiveCellRevealRef = useRef<MarkdownTableCellPosition | null>(null);
     const [tableModel, setTableModel] = useState<MarkdownTableModel>(() => props.initialModel);
     const [activeCell, setActiveCell] = useState<MarkdownTableCellPosition>(() =>
@@ -575,6 +591,7 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
         initialRowHeights,
     );
     const [renderedHeaderHeight, setRenderedHeaderHeight] = useState<number>(MIN_TABLE_ROW_HEIGHT);
+    const [rowEdgeOffsets, setRowEdgeOffsets] = useState<number[]>([]);
     const [virtualViewport, setVirtualViewport] = useState<{ top: number; bottom: number }>(() => ({
         top: 0,
         bottom: 720,
@@ -588,6 +605,7 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
     );
     const columnWidthsRef = useRef<number[]>(initialColumnWidths);
     const rowHeightsRef = useRef<number[]>(initialRowHeights);
+    const rowEdgeOffsetsRef = useRef<number[]>([]);
     const hasCustomLayoutRef = useRef<boolean>(hasCustomLayout);
     const lastCommittedMarkdownRef = useRef<string>(serializeMarkdownTableWithLayout(
         props.initialModel,
@@ -614,6 +632,17 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
         const nextHeights = updater(rowHeightsRef.current);
         rowHeightsRef.current = nextHeights;
         setRowHeights(nextHeights);
+    };
+
+    const applyPendingResizeLayout = (): void => {
+        const pendingLayout = pendingResizeLayoutRef.current;
+        if (!pendingLayout) {
+            return;
+        }
+
+        columnWidthsRef.current = pendingLayout.columnWidths;
+        rowHeightsRef.current = pendingLayout.rowHeights;
+        pendingResizeLayoutRef.current = null;
     };
 
     const tableCellMarkdownComponents = useMemo<Components>(() => ({
@@ -802,7 +831,6 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
         () => tableModel.rows.slice(virtualRange.startIndex, virtualRange.endIndex),
         [tableModel.rows, virtualRange.endIndex, virtualRange.startIndex],
     );
-
     useEffect(() => {
         tableModelRef.current = tableModel;
     }, [tableModel]);
@@ -863,6 +891,58 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
             observer.disconnect();
         };
     }, [tableModel.headers.length]);
+
+    useLayoutEffect(() => {
+        const updateRowEdgeOffsets = (): void => {
+            const nextOffsets = bodyRowRenderHeights.map((_, rowIndex) => {
+                const previousOffset = rowEdgeOffsetsRef.current[rowIndex] ?? 0;
+                const bodyCell = bodyMeasureRefs.current.get(rowIndex);
+                const rowEdge = rowEdgeRefs.current.get(rowIndex);
+                if (!bodyCell || !rowEdge) {
+                    return previousOffset;
+                }
+
+                const bodyCellRect = bodyCell.getBoundingClientRect();
+                const rowEdgeRect = rowEdge.getBoundingClientRect();
+                const bodyCellCenter = bodyCellRect.top + bodyCellRect.height / 2;
+                const rowEdgeCenter = rowEdgeRect.top + rowEdgeRect.height / 2;
+                const delta = bodyCellCenter - rowEdgeCenter;
+                if (!Number.isFinite(delta) || Math.abs(delta) < 0.5) {
+                    return previousOffset;
+                }
+
+                return Math.round((previousOffset + delta) * 100) / 100;
+            });
+
+            if (areRowOffsetsEqual(rowEdgeOffsetsRef.current, nextOffsets)) {
+                return;
+            }
+
+            rowEdgeOffsetsRef.current = nextOffsets;
+            setRowEdgeOffsets(nextOffsets);
+        };
+
+        updateRowEdgeOffsets();
+
+        const observedElements = [
+            ...Array.from(bodyMeasureRefs.current.values()),
+            ...Array.from(rowEdgeRefs.current.values()),
+        ];
+        if (typeof ResizeObserver === "undefined" || observedElements.length === 0) {
+            return;
+        }
+
+        const observer = new ResizeObserver(() => {
+            updateRowEdgeOffsets();
+        });
+        observedElements.forEach((element) => {
+            observer.observe(element);
+        });
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [bodyRowRenderHeights, tableModel.headers.length, virtualRange.endIndex, virtualRange.startIndex, visibleBodyRows.length]);
 
     useLayoutEffect(() => {
         const tableScroll = tableScrollRef.current;
@@ -1007,31 +1087,41 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
 
             if (resizeState.kind === "column") {
                 const delta = event.clientX - resizeState.startClientX;
-                applyColumnWidths((previous) => previous.map((width, index) =>
+                const nextWidths = columnWidthsRef.current.map((width, index) =>
                     index === resizeState.index
                         ? Math.max(MIN_TABLE_COLUMN_WIDTH, resizeState.startSize + delta)
-                        : width,
-                ));
+                        : width);
+                pendingResizeLayoutRef.current = {
+                    columnWidths: nextWidths,
+                    rowHeights: rowHeightsRef.current,
+                };
+                applyColumnWidths(() => nextWidths);
                 return;
             }
 
             const delta = event.clientY - resizeState.startClientY;
-            applyRowHeights((previous) => previous.map((height, index) =>
+            const nextHeights = rowHeightsRef.current.map((height, index) =>
                 index === resizeState.index
                     ? Math.max(MIN_TABLE_ROW_HEIGHT, resizeState.startSize + delta)
-                    : height,
-            ));
+                    : height);
+            pendingResizeLayoutRef.current = {
+                columnWidths: columnWidthsRef.current,
+                rowHeights: nextHeights,
+            };
+            applyRowHeights(() => nextHeights);
         };
 
         const handlePointerEnd = (): void => {
             if (resizeDragStateRef.current) {
                 hasCustomLayoutRef.current = true;
                 setHasCustomLayout(true);
+                applyPendingResizeLayout();
                 resizeDragStateRef.current = null;
                 commitDraftModel();
                 return;
             }
 
+            pendingResizeLayoutRef.current = null;
             resizeDragStateRef.current = null;
         };
 
@@ -1763,8 +1853,19 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
                 data-drop-target={isDropTarget ? true : undefined}
                 draggable
                 title={t("markdownTable.rowHandleTitle")}
+                ref={(element) => {
+                    if (element) {
+                        rowEdgeRefs.current.set(rowIndex, element);
+                        return;
+                    }
+
+                    rowEdgeRefs.current.delete(rowIndex);
+                }}
                 style={{
                     minHeight: bodyRowRenderHeights[rowIndex] ?? rowHeights[rowIndex] ?? MIN_TABLE_ROW_HEIGHT,
+                    transform: rowEdgeOffsets[rowIndex]
+                        ? `translateY(${rowEdgeOffsets[rowIndex]}px)`
+                        : undefined,
                 }}
                 onClick={(event) => {
                     event.preventDefault();
@@ -2469,6 +2570,16 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
                                             key={cellKey}
                                             className="mtv-table-body-cell"
                                             data-edge-selected={isSelectedColumn ? true : undefined}
+                                            ref={columnIndex === 0
+                                                ? (element) => {
+                                                    if (element) {
+                                                        bodyMeasureRefs.current.set(rowIndex, element);
+                                                        return;
+                                                    }
+
+                                                    bodyMeasureRefs.current.delete(rowIndex);
+                                                }
+                                                : undefined}
                                             style={{
                                                 minHeight: bodyRowRenderHeights[rowIndex] ?? rowHeights[rowIndex] ?? MIN_TABLE_ROW_HEIGHT,
                                             }}
