@@ -125,6 +125,13 @@ export { EditorToolbar } from "./components/EditorToolbar";
 export type { EditorToolbarProps } from "./components/EditorToolbar";
 export { useEditorSnapshot } from "./react/useEditorSnapshot";
 export { createDefaultMarkdownPlugins } from "./plugins/defaultMarkdownPlugins";
+export {
+  createDefaultMarkdownCodeMirrorExtensions,
+  ensureDefaultMarkdownCodeMirrorExtensionsRegistered,
+} from "./plugins/defaultMarkdownCodeMirrorExtensions";
+export type {
+  DefaultMarkdownCodeMirrorExtensionsOptions,
+} from "./plugins/defaultMarkdownCodeMirrorExtensions";
 export { createMarkdownFormattingPlugin } from "./plugins/markdownFormattingPlugin";
 export { createLinkOpenPlugin } from "./plugins/linkOpenPlugin";
 export {
@@ -132,6 +139,7 @@ export {
   blobToBase64,
   buildImageEmbedSyntax,
   buildPasteImageAssetRequest,
+  createPasteImageExtension,
   generatePastedImageFileName,
   resolveImageRelativePath,
 } from "./plugins/pasteImagePlugin";

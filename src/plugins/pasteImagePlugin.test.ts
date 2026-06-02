@@ -4,6 +4,7 @@ import {
   blobToBase64,
   buildImageEmbedSyntax,
   buildPasteImageAssetRequest,
+  createPasteImageExtension,
   generatePastedImageFileName,
   resolveImageRelativePath,
 } from "./pasteImagePlugin";
@@ -146,6 +147,13 @@ describe("pasteImagePlugin", () => {
 
     cleanup();
     expect(view.listenerCount()).toBe(0);
+  });
+
+  it("exposes pasted image handling as a CodeMirror extension", () => {
+    expect(createPasteImageExtension({
+      getCurrentFilePath: () => "Notes/current.md",
+      capabilities: {},
+    })).toBeTruthy();
   });
 
   it("does not intercept text paste or read-only image paste", async () => {

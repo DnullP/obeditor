@@ -1,3 +1,5 @@
+import type { Extension } from "@codemirror/state";
+import { EditorView } from "@codemirror/view";
 import type { EditorCapabilitiesSource } from "../core/capabilities";
 import { resolveEditorCapabilities } from "../core/capabilities";
 import { serializeImageEmbedSyntax } from "../markdown/imageEmbedLayout";
@@ -146,90 +148,108 @@ export async function buildPasteImageAssetRequest(file: File): Promise<PasteImag
   };
 }
 
+function handlePasteImageEvent(
+  view: PasteImageEditorView,
+  deps: PasteImageDependencies,
+  event: ClipboardEvent,
+): boolean {
+  if (deps.canMutateDocument && !deps.canMutateDocument()) {
+    logPasteImage(deps, "info", "paste image skipped: editor is read-only", {
+      currentFilePath: deps.getCurrentFilePath(),
+    });
+    return false;
+  }
+
+  const clipboardData = event.clipboardData;
+  if (!clipboardData) {
+    return false;
+  }
+
+  const imageItem = findImageClipboardItem(clipboardData.items);
+  if (!imageItem) {
+    return false;
+  }
+
+  const imageFile = imageItem.getAsFile();
+  if (!imageFile) {
+    logPasteImage(deps, "warn", "paste image skipped: failed to read clipboard file");
+    return false;
+  }
+
+  const capabilities = resolveEditorCapabilities(deps.capabilities);
+  const createAsset = capabilities?.mediaEmbeds?.createAsset;
+  if (!createAsset) {
+    logPasteImage(deps, "warn", "paste image skipped: missing media asset capability", {
+      currentFilePath: deps.getCurrentFilePath(),
+    });
+    return false;
+  }
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  void (async () => {
+    const currentFilePath = deps.getCurrentFilePath();
+    try {
+      const assetRequest = await buildPasteImageAssetRequest(imageFile);
+
+      logPasteImage(deps, "info", "paste image detected", {
+        mimeType: imageFile.type,
+        fileName: assetRequest.fileName,
+        relativePath: assetRequest.relativePath,
+        currentFilePath,
+      });
+
+      const createdAsset = await createAsset(assetRequest.file, {
+        currentFilePath,
+        sourceDocumentId: currentFilePath,
+        suggestedFileName: assetRequest.fileName,
+        suggestedRelativePath: assetRequest.relativePath,
+        base64Content: assetRequest.base64Content,
+        markdown: assetRequest.markdown,
+      });
+      const embedSyntax = createdAsset.markdown || buildImageEmbedSyntax(createdAsset.relativePath);
+      const cursor = view.state.selection.main.head;
+      view.dispatch({
+        changes: {
+          from: cursor,
+          to: cursor,
+          insert: embedSyntax,
+        },
+        selection: {
+          anchor: cursor + embedSyntax.length,
+        },
+      });
+
+      logPasteImage(deps, "info", "paste image inserted", {
+        relativePath: createdAsset.relativePath,
+        markdown: embedSyntax,
+      });
+    } catch (error) {
+      logPasteImage(deps, "error", "paste image failed", {
+        currentFilePath,
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+  })();
+
+  return true;
+}
+
+export function createPasteImageExtension(deps: PasteImageDependencies): Extension {
+  return EditorView.domEventHandlers({
+    paste(event, view) {
+      return handlePasteImageEvent(view, deps, event);
+    },
+  });
+}
+
 export function attachPasteImageHandler(
   view: PasteImageEditorView & { dom: HTMLElement },
   deps: PasteImageDependencies,
 ): () => void {
   const handlePaste = (event: ClipboardEvent): void => {
-    if (deps.canMutateDocument && !deps.canMutateDocument()) {
-      logPasteImage(deps, "info", "paste image skipped: editor is read-only", {
-        currentFilePath: deps.getCurrentFilePath(),
-      });
-      return;
-    }
-
-    const clipboardData = event.clipboardData;
-    if (!clipboardData) {
-      return;
-    }
-
-    const imageItem = findImageClipboardItem(clipboardData.items);
-    if (!imageItem) {
-      return;
-    }
-
-    const imageFile = imageItem.getAsFile();
-    if (!imageFile) {
-      logPasteImage(deps, "warn", "paste image skipped: failed to read clipboard file");
-      return;
-    }
-
-    const capabilities = resolveEditorCapabilities(deps.capabilities);
-    const createAsset = capabilities?.mediaEmbeds?.createAsset;
-    if (!createAsset) {
-      logPasteImage(deps, "warn", "paste image skipped: missing media asset capability", {
-        currentFilePath: deps.getCurrentFilePath(),
-      });
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    void (async () => {
-      const currentFilePath = deps.getCurrentFilePath();
-      try {
-        const assetRequest = await buildPasteImageAssetRequest(imageFile);
-
-        logPasteImage(deps, "info", "paste image detected", {
-          mimeType: imageFile.type,
-          fileName: assetRequest.fileName,
-          relativePath: assetRequest.relativePath,
-          currentFilePath,
-        });
-
-        const createdAsset = await createAsset(assetRequest.file, {
-          currentFilePath,
-          sourceDocumentId: currentFilePath,
-          suggestedFileName: assetRequest.fileName,
-          suggestedRelativePath: assetRequest.relativePath,
-          base64Content: assetRequest.base64Content,
-          markdown: assetRequest.markdown,
-        });
-        const embedSyntax = createdAsset.markdown || buildImageEmbedSyntax(createdAsset.relativePath);
-        const cursor = view.state.selection.main.head;
-        view.dispatch({
-          changes: {
-            from: cursor,
-            to: cursor,
-            insert: embedSyntax,
-          },
-          selection: {
-            anchor: cursor + embedSyntax.length,
-          },
-        });
-
-        logPasteImage(deps, "info", "paste image inserted", {
-          relativePath: createdAsset.relativePath,
-          markdown: embedSyntax,
-        });
-      } catch (error) {
-        logPasteImage(deps, "error", "paste image failed", {
-          currentFilePath,
-          message: error instanceof Error ? error.message : String(error),
-        });
-      }
-    })();
+    handlePasteImageEvent(view, deps, event);
   };
 
   view.dom.addEventListener("paste", handlePaste);
