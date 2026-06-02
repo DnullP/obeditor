@@ -80,6 +80,10 @@ export interface EditorMediaEmbedCapabilities {
 export interface EditorMediaEmbedContext {
   currentFilePath?: string;
   sourceDocumentId?: string;
+  suggestedFileName?: string;
+  suggestedRelativePath?: string;
+  base64Content?: string;
+  markdown?: string;
 }
 
 export interface EditorTextSegment {

@@ -128,6 +128,18 @@ export { createDefaultMarkdownPlugins } from "./plugins/defaultMarkdownPlugins";
 export { createMarkdownFormattingPlugin } from "./plugins/markdownFormattingPlugin";
 export { createLinkOpenPlugin } from "./plugins/linkOpenPlugin";
 export {
+  attachPasteImageHandler,
+  blobToBase64,
+  buildImageEmbedSyntax,
+  buildPasteImageAssetRequest,
+  generatePastedImageFileName,
+  resolveImageRelativePath,
+} from "./plugins/pasteImagePlugin";
+export type {
+  PasteImageAssetRequest,
+  PasteImageDependencies,
+} from "./plugins/pasteImagePlugin";
+export {
   getRegisteredEditPluginExtensions,
   registerEditPlugin,
   unregisterEditPlugin,

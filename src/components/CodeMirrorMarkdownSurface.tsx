@@ -6,6 +6,7 @@ import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 import { editorBaseSetup } from "../core/editorBaseSetup";
 import { createEditorThemeExtension } from "../core/codemirrorTheme";
 import type { EditorService } from "../core/types";
+import { attachPasteImageHandler } from "../plugins/pasteImagePlugin";
 import { useEditorSnapshot } from "../react/useEditorSnapshot";
 
 export interface CodeMirrorMarkdownSurfaceProps {
@@ -61,8 +62,14 @@ export function CodeMirrorMarkdownSurface({
     });
     viewRef.current = view;
     service.attachView(view);
+    const cleanupPasteImageHandler = attachPasteImageHandler(view, {
+      getCurrentFilePath: () => service.getSnapshot().document.path ?? "",
+      capabilities: () => service.getCapabilities(),
+      canMutateDocument: () => !readOnly,
+    });
 
     return () => {
+      cleanupPasteImageHandler();
       service.attachView(null);
       view.destroy();
       viewRef.current = null;
