@@ -22,7 +22,7 @@ function createBaseContext(): VimHandoffContext {
     return {
         surface: "editor-body",
         key: "j",
-        markdown: "Before\n$$x^2$$\nAfter",
+        markdown: "Before\nPlain\nAfter",
         currentLineNumber: 1,
         selectionHead: 0,
         hasFrontmatter: false,
