@@ -13,8 +13,13 @@
     "src/components/**/*.ts",
     "src/components/**/*.tsx",
     "src/core/**/*.ts",
+    "src/markdown/**/*.ts",
     "src/plugins/**/*.ts",
-    "src/react/**/*.ts"
+    "src/plugins/**/*.tsx",
+    "src/react/**/*.ts",
+    "src/ui/**/*.ts",
+    "src/ui/**/*.tsx",
+    "src/utils/**/*.ts"
   ],
   "exclude": [
     "src/**/*.test.ts",

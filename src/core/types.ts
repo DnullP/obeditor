@@ -1,3 +1,5 @@
+import type { EditorCapabilities, EditorCapabilitiesSource } from "./capabilities";
+
 export type EditorMode = "edit" | "read" | "split";
 export type EditorStatus = "idle" | "loading" | "saving" | "error";
 export type EditorSurfaceHandle = unknown;
@@ -46,6 +48,7 @@ export interface EditorViewAttachOptions {
 }
 
 export interface EditorHostAdapter {
+  capabilities?: EditorCapabilitiesSource;
   loadDocument?: (ref: EditorDocumentRef) => Promise<Partial<EditorDocument> & { content: string }>;
   saveDocument?: (document: EditorDocument, snapshot: EditorSnapshot) => Promise<Partial<EditorDocument> | void>;
   onDocumentChanged?: (document: EditorDocument, snapshot: EditorSnapshot) => void;
@@ -64,6 +67,7 @@ export interface EditorCommandContext<
   document: EditorDocument;
   snapshot: EditorSnapshot;
   host: EditorHostAdapter;
+  capabilities: EditorCapabilities;
   view: TView | null;
   updateContent: (content: string, reason?: string) => void;
 }
@@ -85,6 +89,7 @@ export interface EditorPluginContext<
   TExtension = EditorRuntimeExtension,
 > {
   host: EditorHostAdapter;
+  capabilities: EditorCapabilities;
   getSnapshot: () => EditorSnapshot;
   updateContent: (content: string, reason?: string) => void;
   setMode: (mode: EditorMode) => void;
@@ -133,6 +138,7 @@ export interface EditorService<
   save: () => Promise<void>;
   setMode: (mode: EditorMode) => void;
   executeCommand: (commandId: string) => Promise<void>;
+  getCapabilities: () => EditorCapabilities;
   getCodeMirrorExtensions: () => TExtension[];
   attachView: (view: TView | null, options?: EditorViewAttachOptions) => void;
   dispose: () => void;

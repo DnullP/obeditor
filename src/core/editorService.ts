@@ -15,6 +15,11 @@ import type {
   EditorSurfaceHandle,
   EditorViewAttachOptions,
 } from "./types";
+import {
+  EMPTY_EDITOR_CAPABILITIES,
+  type EditorCapabilities,
+  resolveEditorCapabilities,
+} from "./capabilities";
 
 const DEFAULT_DOCUMENT_ID = "document:untitled";
 
@@ -209,6 +214,7 @@ class EditorServiceImpl<
       document: snapshot.document,
       snapshot,
       host: this.host,
+      capabilities: this.getCapabilities(),
       view: this.view,
     };
     if (command.isEnabled && !command.isEnabled(context)) {
@@ -223,6 +229,10 @@ class EditorServiceImpl<
 
   getCodeMirrorExtensions(): TExtension[] {
     return [...this.codeMirrorExtensions];
+  }
+
+  getCapabilities(): EditorCapabilities {
+    return resolveEditorCapabilities(this.host.capabilities) ?? EMPTY_EDITOR_CAPABILITIES;
   }
 
   attachView(view: TView | null, options: EditorViewAttachOptions = {}): void {
@@ -245,6 +255,7 @@ class EditorServiceImpl<
       this.pluginIds.push(plugin.id);
       const context: EditorPluginContext<TView, TExtension> = {
         host: this.host,
+        capabilities: this.getCapabilities(),
         getSnapshot: () => this.getSnapshot(),
         updateContent: (content, reason) => this.updateContent(content, reason),
         setMode: (mode) => this.setMode(mode),
@@ -328,6 +339,7 @@ class EditorServiceImpl<
           document: snapshot.document,
           snapshot: snapshot as EditorSnapshot,
           host: this.host,
+          capabilities: this.getCapabilities(),
           view: this.view,
         })
         : true,

@@ -1,26 +1,25 @@
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
-const externalDependencies = [
-  "react",
-  "react-dom",
+const packageJson = JSON.parse(readFileSync(resolve(__dirname, "package.json"), "utf8")) as {
+  dependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+};
+
+const externalPackages = new Set([
+  ...Object.keys(packageJson.dependencies ?? {}),
+  ...Object.keys(packageJson.peerDependencies ?? {}),
   "react/jsx-runtime",
-  "@codemirror/autocomplete",
-  "@codemirror/commands",
-  "@codemirror/lang-markdown",
-  "@codemirror/language",
-  "@codemirror/lint",
-  "@codemirror/search",
-  "@codemirror/state",
-  "@codemirror/view",
-  "@lezer/highlight",
-  "codemirror",
-  "lucide-react",
-  "react-markdown",
-  "remark-breaks",
-  "remark-gfm",
-];
+  "react/jsx-dev-runtime",
+]);
+
+function isExternalDependency(id: string): boolean {
+  return [...externalPackages].some((packageName) =>
+    id === packageName || id.startsWith(`${packageName}/`),
+  );
+}
 
 export default defineConfig({
   plugins: [react()],
@@ -38,7 +37,7 @@ export default defineConfig({
       fileName: (format) => (format === "es" ? "index.js" : "index.cjs"),
     },
     rollupOptions: {
-      external: externalDependencies,
+      external: isExternalDependency,
       output: {
         assetFileNames: (assetInfo) => assetInfo.name === "style.css" ? "obeditor.css" : "[name][extname]",
         globals: {

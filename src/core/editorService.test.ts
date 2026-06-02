@@ -149,4 +149,40 @@ describe("createEditorService", () => {
     expect(service.getSnapshot().document.content).toBe("hello!");
     expect(service.getSnapshot().pluginIds).toEqual(["test-plugin"]);
   });
+
+  it("passes host capabilities into plugin setup and command execution", async () => {
+    const plugin: EditorPlugin = {
+      id: "capability-reader",
+      setup(context) {
+        const setupText = context.capabilities.localization?.t("setup", undefined, "missing") ?? "missing";
+        return {
+          commands: [
+            {
+              id: "test.readCapability",
+              label: "Read capability",
+              run: ({ capabilities, updateContent }) => {
+                updateContent(capabilities.localization?.t("run", undefined, setupText) ?? setupText);
+              },
+            },
+          ],
+        };
+      },
+    };
+    const service = createEditorService({
+      document: { id: "demo", content: "" },
+      adapter: {
+        capabilities: {
+          localization: {
+            t: (key) => `translated:${key}`,
+          },
+        },
+      },
+      plugins: [plugin],
+    });
+
+    expect(service.getCapabilities().localization).toBeDefined();
+    await service.executeCommand("test.readCapability");
+
+    expect(service.getSnapshot().document.content).toBe("translated:run");
+  });
 });
