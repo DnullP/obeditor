@@ -48,7 +48,7 @@ describe("estimateMarkdownTableWidgetHeight", () => {
             rows: Array.from({ length: 44 }, () => ["metric", "owner", "status", "detail"]),
         }, null);
 
-        expect(estimatedHeight).toBe(1760);
+        expect(estimatedHeight).toBe(1784);
     });
 
     test("应优先使用持久化行高估算已调整过的表格", () => {
@@ -61,7 +61,18 @@ describe("estimateMarkdownTableWidgetHeight", () => {
             rowHeights: [96, 128],
         });
 
-        expect(estimatedHeight).toBe(312);
+        expect(estimatedHeight).toBe(336);
+    });
+
+    test("应为真实笔记中的插件表格预留足够高度，避免覆盖后续引用段落", () => {
+        const estimatedHeight = estimateMarkdownTableWidgetHeight({
+            rows: Array.from({ length: 15 }, () => ["tauri-plugin-example", "作用", "关键能力"]),
+        }, {
+            columnWidths: [226, 164, 208],
+            rowHeights: Array.from({ length: 15 }, () => 38),
+        });
+
+        expect(estimatedHeight).toBe(682);
     });
 });
 

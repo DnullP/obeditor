@@ -49,7 +49,10 @@ export function createEditorThemeExtension() {
         borderLeftColor: "var(--oe-editor-caret)",
       },
       "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, .cm-selectionBackground": {
-        backgroundColor: "var(--oe-editor-selection)",
+        background: "var(--editor-selection-bg-color, var(--oe-editor-selection, rgba(47, 111, 237, 0.28))) !important",
+      },
+      ".cm-line ::selection, .cm-line::selection": {
+        backgroundColor: "transparent !important",
       },
       ".cm-gutters": {
         color: "var(--oe-editor-muted)",

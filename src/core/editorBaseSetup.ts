@@ -2,6 +2,7 @@ import type { Extension } from "@codemirror/state";
 import { EditorState } from "@codemirror/state";
 import {
   crosshairCursor,
+  drawSelection,
   dropCursor,
   highlightActiveLine,
   highlightActiveLineGutter,
@@ -46,6 +47,7 @@ export const editorBaseSetup: Extension = [
   bracketMatching(),
   closeBrackets(),
   autocompletion(),
+  drawSelection(),
   rectangularSelection(),
   crosshairCursor(),
   highlightActiveLine(),

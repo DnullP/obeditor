@@ -403,7 +403,7 @@ class MarkdownTableWidget extends WidgetType {
     toDOM(view: EditorView): HTMLElement {
         const wrapper = document.createElement("section");
         wrapper.className = "cm-markdown-table-widget";
-        wrapper.style.height = `${String(estimateMarkdownTableWidgetHeight(this.model, this.layout))}px`;
+        wrapper.style.minHeight = `${String(estimateMarkdownTableWidgetHeight(this.model, this.layout))}px`;
         const scrollDOM = view.scrollDOM;
         this.wheelForwarder = new MarkdownTableWheelForwarder({
             scrollTarget: scrollDOM,

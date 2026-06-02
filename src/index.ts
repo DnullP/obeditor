@@ -36,6 +36,16 @@ export {
   translateEditorTextFromSource,
 } from "./core/capabilities";
 export type {
+  DefaultEditorCapabilities,
+  DefaultEditorCapabilitiesOptions,
+  DefaultEditorMemoryAsset,
+  DefaultEditorMemoryDocument,
+} from "./core/defaultCapabilities";
+export {
+  createDefaultEditorCapabilities,
+  defaultEditorCapabilities,
+} from "./core/defaultCapabilities";
+export type {
   EditorCommand,
   EditorCommandContext,
   EditorCommandDescriptor,
@@ -114,7 +124,10 @@ export {
 export { UniversalMarkdownEditor } from "./components/UniversalMarkdownEditor";
 export type { UniversalMarkdownEditorProps } from "./components/UniversalMarkdownEditor";
 export { CodeMirrorMarkdownSurface } from "./components/CodeMirrorMarkdownSurface";
-export type { CodeMirrorMarkdownSurfaceProps } from "./components/CodeMirrorMarkdownSurface";
+export type {
+  CodeMirrorLineNumbersMode,
+  CodeMirrorMarkdownSurfaceProps,
+} from "./components/CodeMirrorMarkdownSurface";
 export {
   MarkdownReadView,
   revealMarkdownReadViewLine,
@@ -132,6 +145,22 @@ export {
 export type {
   DefaultMarkdownCodeMirrorExtensionsOptions,
 } from "./plugins/defaultMarkdownCodeMirrorExtensions";
+export {
+  isDefaultMarkdownPresentationReady,
+  markdownDocumentStartsWithFrontmatter,
+} from "./plugins/defaultMarkdownPresentationReady";
+export type {
+  MarkdownPresentationReadyContext,
+} from "./plugins/defaultMarkdownPresentationReady";
+export {
+  EMPTY_DEFAULT_MARKDOWN_INTERACTION_TARGET_STATE,
+  focusDefaultMarkdownWidgetVimNavigationTarget,
+  resolveDefaultMarkdownInteractionTargetState,
+} from "./plugins/defaultMarkdownWidgetNavigation";
+export type {
+  DefaultMarkdownInteractionTargetState,
+  DefaultMarkdownWidgetNavigationRequest,
+} from "./plugins/defaultMarkdownWidgetNavigation";
 export { createMarkdownFormattingPlugin } from "./plugins/markdownFormattingPlugin";
 export { createLinkOpenPlugin } from "./plugins/linkOpenPlugin";
 export {

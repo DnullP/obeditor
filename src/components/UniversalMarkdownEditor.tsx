@@ -3,7 +3,10 @@ import { createEditorService } from "../core/editorService";
 import type { EditorHostAdapter, EditorPlugin, EditorService } from "../core/types";
 import { createDefaultMarkdownPlugins } from "../plugins/defaultMarkdownPlugins";
 import { useEditorSnapshot } from "../react/useEditorSnapshot";
-import { CodeMirrorMarkdownSurface } from "./CodeMirrorMarkdownSurface";
+import {
+  CodeMirrorMarkdownSurface,
+  type CodeMirrorLineNumbersMode,
+} from "./CodeMirrorMarkdownSurface";
 import { EditorToolbar } from "./EditorToolbar";
 import { MarkdownReadView } from "./MarkdownReadView";
 import "../styles/editor.css";
@@ -15,6 +18,10 @@ export interface UniversalMarkdownEditorProps {
   path?: string;
   adapter?: EditorHostAdapter;
   plugins?: EditorPlugin[];
+  lineNumbers?: CodeMirrorLineNumbersMode | boolean;
+  vimMode?: boolean;
+  readOnly?: boolean;
+  defaultMarkdownExtensions?: boolean;
   className?: string;
 }
 
@@ -25,6 +32,10 @@ export function UniversalMarkdownEditor({
   path,
   adapter,
   plugins,
+  lineNumbers,
+  vimMode,
+  readOnly,
+  defaultMarkdownExtensions,
   className,
 }: UniversalMarkdownEditorProps) {
   const ownedService = useMemo(() => {
@@ -55,15 +66,32 @@ export function UniversalMarkdownEditor({
     return null;
   }
 
-  return <UniversalMarkdownEditorSurface className={className} service={activeService} />;
+  return (
+    <UniversalMarkdownEditorSurface
+      className={className}
+      lineNumbers={lineNumbers}
+      readOnly={readOnly}
+      defaultMarkdownExtensions={defaultMarkdownExtensions}
+      service={activeService}
+      vimMode={vimMode}
+    />
+  );
 }
 
 function UniversalMarkdownEditorSurface({
   service,
   className,
+  lineNumbers,
+  vimMode,
+  readOnly,
+  defaultMarkdownExtensions,
 }: {
   service: EditorService;
   className?: string;
+  lineNumbers?: CodeMirrorLineNumbersMode | boolean;
+  vimMode?: boolean;
+  readOnly?: boolean;
+  defaultMarkdownExtensions?: boolean;
 }) {
   const snapshot = useEditorSnapshot(service);
   const rootClassName = ["oe-editor", className].filter(Boolean).join(" ");
@@ -75,7 +103,13 @@ function UniversalMarkdownEditorSurface({
       <div className="oe-editor-body">
         {snapshot.mode !== "read" ? (
           <div className="oe-editor-pane">
-            <CodeMirrorMarkdownSurface service={service} />
+            <CodeMirrorMarkdownSurface
+              defaultMarkdownExtensions={defaultMarkdownExtensions}
+              lineNumbers={lineNumbers}
+              readOnly={readOnly}
+              service={service}
+              vimMode={vimMode}
+            />
           </div>
         ) : null}
         {snapshot.mode !== "edit" ? (

@@ -551,7 +551,6 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
     const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
     const navigationRefs = useRef<Map<string, HTMLDivElement>>(new Map());
     const headerMeasureRef = useRef<HTMLElement | null>(null);
-    const bodyRowMeasureRefs = useRef<Map<number, HTMLElement>>(new Map());
     const inputImeCompositionGuard = useRef(createImeCompositionGuard()).current;
     const isCommittingDraftRef = useRef<boolean>(false);
     const pendingInputSelectionRef = useRef<PendingInputSelection | null>(null);
@@ -576,9 +575,6 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
         initialRowHeights,
     );
     const [renderedHeaderHeight, setRenderedHeaderHeight] = useState<number>(MIN_TABLE_ROW_HEIGHT);
-    const [renderedRowHeights, setRenderedRowHeights] = useState<number[]>(() =>
-        estimateMarkdownTableBodyRowHeights(props.initialModel, initialColumnWidths, initialRowHeights),
-    );
     const [virtualViewport, setVirtualViewport] = useState<{ top: number; bottom: number }>(() => ({
         top: 0,
         bottom: 720,
@@ -842,33 +838,14 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
                 MIN_TABLE_ROW_HEIGHT,
                 Math.ceil(headerMeasureRef.current?.getBoundingClientRect().height ?? MIN_TABLE_ROW_HEIGHT),
             );
-            const nextRowHeights = bodyRowRenderHeights.map((estimatedHeight, rowIndex) => {
-                const measuredHeight = bodyRowMeasureRefs.current.get(rowIndex)?.getBoundingClientRect().height;
-                return Math.max(
-                    estimatedHeight,
-                    rowHeights[rowIndex] ?? MIN_TABLE_ROW_HEIGHT,
-                    Math.ceil(measuredHeight ?? MIN_TABLE_ROW_HEIGHT),
-                );
-            });
 
             setRenderedHeaderHeight((previous) => (previous === nextHeaderHeight ? previous : nextHeaderHeight));
-            setRenderedRowHeights((previous) => {
-                if (
-                    previous.length === nextRowHeights.length
-                    && previous.every((height, index) => height === nextRowHeights[index])
-                ) {
-                    return previous;
-                }
-
-                return nextRowHeights;
-            });
         };
 
         updateRenderedEdgeHeights();
 
         const observedElements = [
             headerMeasureRef.current,
-            ...Array.from(bodyRowMeasureRefs.current.values()),
         ].filter((element): element is HTMLElement => element !== null);
 
         if (typeof ResizeObserver === "undefined" || observedElements.length === 0) {
@@ -885,7 +862,7 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
         return () => {
             observer.disconnect();
         };
-    }, [bodyRowRenderHeights, rowHeights, tableModel.headers.length, tableModel.rows.length]);
+    }, [tableModel.headers.length]);
 
     useLayoutEffect(() => {
         const tableScroll = tableScrollRef.current;
@@ -1787,7 +1764,7 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
                 draggable
                 title={t("markdownTable.rowHandleTitle")}
                 style={{
-                    minHeight: renderedRowHeights[rowIndex] ?? rowHeights[rowIndex] ?? MIN_TABLE_ROW_HEIGHT,
+                    minHeight: bodyRowRenderHeights[rowIndex] ?? rowHeights[rowIndex] ?? MIN_TABLE_ROW_HEIGHT,
                 }}
                 onClick={(event) => {
                     event.preventDefault();
@@ -2492,15 +2469,6 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
                                             key={cellKey}
                                             className="mtv-table-body-cell"
                                             data-edge-selected={isSelectedColumn ? true : undefined}
-                                            ref={columnIndex === 0
-                                                ? (element) => {
-                                                    if (element) {
-                                                        bodyRowMeasureRefs.current.set(rowIndex, element);
-                                                        return;
-                                                    }
-                                                    bodyRowMeasureRefs.current.delete(rowIndex);
-                                                }
-                                                : undefined}
                                             style={{
                                                 minHeight: bodyRowRenderHeights[rowIndex] ?? rowHeights[rowIndex] ?? MIN_TABLE_ROW_HEIGHT,
                                             }}

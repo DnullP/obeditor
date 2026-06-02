@@ -7,7 +7,7 @@ import type { MarkdownTableModel } from "./markdownTableModel";
 
 export const MARKDOWN_TABLE_MIN_ROW_HEIGHT = 38;
 export const MARKDOWN_TABLE_HEADER_HEIGHT = 38;
-export const MARKDOWN_TABLE_VERTICAL_CHROME_HEIGHT = 50;
+export const MARKDOWN_TABLE_VERTICAL_CHROME_HEIGHT = 74;
 
 const DEFAULT_TABLE_COLUMN_WIDTH = 164;
 const CELL_HORIZONTAL_PADDING = 20;

@@ -21,6 +21,8 @@ function isExternalDependency(id: string): boolean {
   );
 }
 
+const isDemoBuild = process.env.OBEDITOR_BUILD_TARGET === "demo";
+
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -30,36 +32,41 @@ export default defineConfig({
   },
   build: {
     emptyOutDir: false,
-    lib: {
-      entry: resolve(__dirname, "src/index.ts"),
-      name: "Obeditor",
-      formats: ["es", "cjs"],
-      fileName: (format) => (format === "es" ? "index.js" : "index.cjs"),
-    },
-    rollupOptions: {
-      external: isExternalDependency,
-      output: {
-        assetFileNames: (assetInfo) => assetInfo.name === "style.css" ? "obeditor.css" : "[name][extname]",
-        globals: {
-          react: "React",
-          "react-dom": "ReactDOM",
-          "react/jsx-runtime": "React",
-          "@codemirror/autocomplete": "CodeMirrorAutocomplete",
-          "@codemirror/commands": "CodeMirrorCommands",
-          "@codemirror/lang-markdown": "CodeMirrorMarkdown",
-          "@codemirror/language": "CodeMirrorLanguage",
-          "@codemirror/lint": "CodeMirrorLint",
-          "@codemirror/search": "CodeMirrorSearch",
-          "@codemirror/state": "CodeMirrorState",
-          "@codemirror/view": "CodeMirrorView",
-          "@lezer/highlight": "LezerHighlight",
-          codemirror: "CodeMirror",
-          "lucide-react": "LucideReact",
-          "react-markdown": "ReactMarkdown",
-          "remark-breaks": "remarkBreaks",
-          "remark-gfm": "remarkGfm",
+    assetsInlineLimit: 0,
+    ...(!isDemoBuild
+      ? {
+        lib: {
+          entry: resolve(__dirname, "src/index.ts"),
+          name: "Obeditor",
+          formats: ["es", "cjs"] as const,
+          fileName: (format: string) => (format === "es" ? "index.js" : "index.cjs"),
         },
-      },
-    },
+        rollupOptions: {
+          external: isExternalDependency,
+          output: {
+            assetFileNames: (assetInfo: { name?: string }) => assetInfo.name === "style.css" ? "obeditor.css" : "[name][extname]",
+            globals: {
+              react: "React",
+              "react-dom": "ReactDOM",
+              "react/jsx-runtime": "React",
+              "@codemirror/autocomplete": "CodeMirrorAutocomplete",
+              "@codemirror/commands": "CodeMirrorCommands",
+              "@codemirror/lang-markdown": "CodeMirrorMarkdown",
+              "@codemirror/language": "CodeMirrorLanguage",
+              "@codemirror/lint": "CodeMirrorLint",
+              "@codemirror/search": "CodeMirrorSearch",
+              "@codemirror/state": "CodeMirrorState",
+              "@codemirror/view": "CodeMirrorView",
+              "@lezer/highlight": "LezerHighlight",
+              codemirror: "CodeMirror",
+              "lucide-react": "LucideReact",
+              "react-markdown": "ReactMarkdown",
+              "remark-breaks": "remarkBreaks",
+              "remark-gfm": "remarkGfm",
+            },
+          },
+        },
+      }
+      : {}),
   },
 });

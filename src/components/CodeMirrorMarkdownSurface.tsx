@@ -2,28 +2,59 @@ import { useEffect, useMemo, useRef } from "react";
 import { markdown } from "@codemirror/lang-markdown";
 import { indentWithTab } from "@codemirror/commands";
 import { EditorState, type Extension } from "@codemirror/state";
-import { EditorView, keymap, lineNumbers } from "@codemirror/view";
+import { EditorView, keymap } from "@codemirror/view";
+import { vim } from "@replit/codemirror-vim";
 import { editorBaseSetup } from "../core/editorBaseSetup";
 import { createEditorThemeExtension } from "../core/codemirrorTheme";
+import { buildLineNumbersExtension } from "../core/lineNumbersModeExtension";
 import type { EditorService } from "../core/types";
-import { attachPasteImageHandler } from "../plugins/pasteImagePlugin";
+import { createDefaultMarkdownCodeMirrorExtensions } from "../plugins/defaultMarkdownCodeMirrorExtensions";
 import { useEditorSnapshot } from "../react/useEditorSnapshot";
+
+export type CodeMirrorLineNumbersMode = "off" | "absolute" | "relative";
 
 export interface CodeMirrorMarkdownSurfaceProps {
   service: EditorService;
-  lineNumbers?: boolean;
+  lineNumbers?: CodeMirrorLineNumbersMode | boolean;
+  vimMode?: boolean;
   readOnly?: boolean;
+  defaultMarkdownExtensions?: boolean;
+}
+
+function normalizeLineNumbersMode(lineNumbers: CodeMirrorMarkdownSurfaceProps["lineNumbers"]): CodeMirrorLineNumbersMode {
+  if (lineNumbers === false) {
+    return "off";
+  }
+  if (lineNumbers === "off" || lineNumbers === "relative") {
+    return lineNumbers;
+  }
+  return "absolute";
 }
 
 export function CodeMirrorMarkdownSurface({
   service,
-  lineNumbers: showLineNumbers = true,
+  lineNumbers = "absolute",
+  vimMode = false,
   readOnly = false,
+  defaultMarkdownExtensions = true,
 }: CodeMirrorMarkdownSurfaceProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const viewRef = useRef<EditorView | null>(null);
   const applyingExternalChangeRef = useRef(false);
   const snapshot = useEditorSnapshot(service);
+  const lineNumbersMode = normalizeLineNumbersMode(lineNumbers);
+  const defaultMarkdownCodeMirrorExtensions = useMemo(() => {
+    if (!defaultMarkdownExtensions) {
+      return [];
+    }
+
+    return createDefaultMarkdownCodeMirrorExtensions({
+      getCurrentFilePath: () => service.getSnapshot().document.path ?? "",
+      getCurrentDocumentContent: () => service.getSnapshot().document.content,
+      canMutateDocument: () => !readOnly,
+      capabilities: () => service.getCapabilities(),
+    });
+  }, [defaultMarkdownExtensions, readOnly, service]);
   const pluginExtensions = useMemo(
     () => service.getCodeMirrorExtensions() as Extension[],
     [service],
@@ -49,9 +80,11 @@ export function CodeMirrorMarkdownSurface({
         createEditorThemeExtension(),
         EditorView.lineWrapping,
         keymap.of([indentWithTab]),
-        showLineNumbers ? lineNumbers() : [],
+        buildLineNumbersExtension(lineNumbersMode),
+        vimMode ? vim() : [],
         readOnly ? EditorState.readOnly.of(true) : [],
         updateListener,
+        ...defaultMarkdownCodeMirrorExtensions,
         ...pluginExtensions,
       ],
     });
@@ -62,19 +95,13 @@ export function CodeMirrorMarkdownSurface({
     });
     viewRef.current = view;
     service.attachView(view);
-    const cleanupPasteImageHandler = attachPasteImageHandler(view, {
-      getCurrentFilePath: () => service.getSnapshot().document.path ?? "",
-      capabilities: () => service.getCapabilities(),
-      canMutateDocument: () => !readOnly,
-    });
 
     return () => {
-      cleanupPasteImageHandler();
       service.attachView(null);
       view.destroy();
       viewRef.current = null;
     };
-  }, [pluginExtensions, readOnly, service, showLineNumbers]);
+  }, [defaultMarkdownCodeMirrorExtensions, lineNumbersMode, pluginExtensions, readOnly, service, vimMode]);
 
   useEffect(() => {
     const view = viewRef.current;
@@ -98,5 +125,5 @@ export function CodeMirrorMarkdownSurface({
     applyingExternalChangeRef.current = false;
   }, [snapshot.document.content]);
 
-  return <div className="oe-code-editor" ref={hostRef} />;
+  return <div className="oe-code-editor cm-tab-editor" ref={hostRef} />;
 }

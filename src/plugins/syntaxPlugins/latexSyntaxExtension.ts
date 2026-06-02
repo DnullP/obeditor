@@ -187,7 +187,7 @@ class InlineLatexWidget extends WidgetType {
      * @returns 渲染后的 HTML 元素。
      */
     toDOM(): HTMLElement {
-        /* styles: cm-latex-inline-widget（见 CodeMirrorEditorTab.css） */
+        /* styles: cm-latex-inline-widget（见 obeditor Markdown plugin styles） */
         const wrapper = document.createElement("span");
         wrapper.className = this.isError
             ? "cm-latex-inline-widget cm-latex-inline-error"
@@ -248,7 +248,7 @@ class BlockLatexWidget extends WidgetType {
      * @returns 渲染后的 HTML 元素。
      */
     toDOM(): HTMLElement {
-        /* styles: cm-latex-block-widget（见 CodeMirrorEditorTab.css） */
+        /* styles: cm-latex-block-widget（见 obeditor Markdown plugin styles） */
         const wrapper = document.createElement("div");
         wrapper.className = this.isError
             ? "cm-latex-block-widget cm-latex-block-error"

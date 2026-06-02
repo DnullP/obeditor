@@ -1636,6 +1636,7 @@ export function FrontmatterYamlVisualEditor(props: FrontmatterYamlVisualEditorPr
         <section
             ref={wrapperRef}
             className="fmv-editor"
+            data-obeditor-frontmatter-ready="true"
             onFocusCapture={handleWrapperFocusCapture}
             onBlurCapture={handleWrapperBlurCapture}
         >

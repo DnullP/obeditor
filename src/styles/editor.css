@@ -1,3 +1,95 @@
+@import "katex/dist/katex.min.css";
+@import "./markdownPlugins.css";
+
+:root:not([data-theme]) {
+  --editor-bg-color: var(--oe-editor-bg, #ffffff);
+  --editor-title-input-bg-color: var(--editor-bg-color);
+  --editor-text-color: var(--oe-editor-text, #1d2430);
+  --editor-gutter-bg-color: var(--oe-surface-muted, #f1f4f8);
+  --editor-gutter-text-color: var(--oe-muted, #6f7b8d);
+  --editor-selection-bg-color: var(--oe-editor-selection, rgba(47, 111, 237, 0.18));
+  --editor-selection-text-color: var(--oe-editor-text, #1d2430);
+  --editor-caret-color: var(--oe-editor-caret, #1f65d6);
+  --editor-active-line-bg-color: var(--oe-editor-active-line, rgba(47, 111, 237, 0.06));
+  --editor-active-line-gutter-bg-color: rgba(47, 111, 237, 0.12);
+  --editor-muted-text-color: var(--oe-editor-muted, #788396);
+  --editor-faint-text-color: color-mix(in srgb, var(--oe-editor-muted, #788396) 72%, transparent);
+  --editor-symbol-color: var(--oe-editor-symbol-color, #8591a3);
+  --editor-symbol-shadow-color: transparent;
+  --editor-panel-bg-color: var(--oe-surface, #ffffff);
+  --editor-panel-bg-elevated-color: var(--oe-surface-muted, #f1f4f8);
+  --editor-panel-bg-soft-color: color-mix(in srgb, var(--oe-surface-muted, #f1f4f8) 72%, white);
+  --editor-panel-border-color: var(--oe-border, #d8dee8);
+  --editor-panel-text-color: var(--oe-text, #1d2430);
+  --editor-panel-muted-text-color: var(--oe-muted, #6f7b8d);
+  --editor-panel-shadow-light: 0 6px 16px rgba(29, 36, 48, 0.08);
+  --editor-panel-shadow-medium: 0 10px 24px rgba(29, 36, 48, 0.12);
+  --editor-link-color: var(--oe-accent, #2f6fed);
+  --editor-inline-code-bg: #eef2f7;
+  --editor-tag-bg-color: color-mix(in srgb, var(--oe-accent, #2f6fed) 10%, var(--oe-surface-muted, #f1f4f8));
+  --editor-tag-border-color: color-mix(in srgb, var(--oe-accent, #2f6fed) 22%, var(--oe-border, #d8dee8));
+  --editor-tag-text-color: var(--oe-text, #1d2430);
+  --editor-blockquote-text-color: var(--oe-muted, #6f7b8d);
+  --editor-blockquote-border-color: var(--oe-border, #d8dee8);
+  --editor-list-marker-color: var(--oe-muted, #6f7b8d);
+  --editor-list-source-marker-color: var(--editor-symbol-color);
+  --editor-list-source-marker-shadow-color: var(--editor-symbol-shadow-color);
+  --editor-task-checkbox-border-color: var(--oe-border, #d8dee8);
+  --editor-divider-color: var(--oe-border, #d8dee8);
+  --editor-header-text-color: color-mix(in srgb, var(--oe-text, #1d2430) 82%, var(--oe-accent, #2f6fed));
+  --editor-header-rule-color: color-mix(in srgb, var(--oe-border, #d8dee8) 68%, var(--oe-accent, #2f6fed));
+  --editor-highlight-bg: rgba(255, 213, 79, 0.35);
+  --editor-code-block-bg: transparent;
+  --editor-warning-text-color: #8b1e2d;
+  --editor-warning-bg-color: #fff0f2;
+  --editor-frontmatter-focus-bg: transparent;
+  --accent-primary: var(--oe-accent, #2f6fed);
+  --accent-primary-foreground: #ffffff;
+  --accent-primary-soft: rgba(47, 111, 237, 0.2);
+  --accent-primary-soft-weak: rgba(47, 111, 237, 0.14);
+  --bg-primary: var(--oe-surface, #ffffff);
+  --bg-secondary: var(--oe-surface-muted, #f1f4f8);
+  --bg-hover: color-mix(in srgb, var(--oe-surface-muted, #f1f4f8) 76%, white);
+  --border-color: var(--oe-border, #d8dee8);
+  --text-primary: var(--oe-text, #1d2430);
+  --text-secondary: var(--oe-muted, #6f7b8d);
+  --text-tertiary: color-mix(in srgb, var(--oe-muted, #6f7b8d) 72%, transparent);
+  --surface-chip-border: color-mix(in srgb, var(--oe-border, #d8dee8) 72%, transparent);
+  --content-material-bg: var(--oe-surface, #ffffff);
+  --content-material-bg-muted: var(--oe-surface-muted, #f1f4f8);
+  --content-material-border: var(--oe-border, #d8dee8);
+  --content-material-hover-bg: color-mix(in srgb, var(--oe-accent, #2f6fed) 9%, var(--oe-surface-muted, #f1f4f8));
+  --content-material-pill-bg: color-mix(in srgb, var(--oe-surface-muted, #f1f4f8) 90%, transparent);
+  --floating-surface-bg: var(--oe-surface, #ffffff);
+  --floating-surface-bg-strong: var(--oe-surface, #ffffff);
+  --floating-surface-border: var(--oe-border, #d8dee8);
+  --floating-surface-shadow: 0 12px 32px rgba(29, 36, 48, 0.16);
+  --overlay-shadow-floating: 0 4px 16px rgba(29, 36, 48, 0.12);
+  --overlay-shadow-strong: 0 12px 32px rgba(29, 36, 48, 0.18);
+  --editor-suggest-item-hover-bg: color-mix(in srgb, var(--accent-primary-soft-weak) 72%, var(--editor-panel-bg-soft-color));
+  --editor-suggest-item-hover-border-color: color-mix(in srgb, var(--accent-primary) 55%, transparent);
+  --editor-suggest-item-selected-bg: color-mix(in srgb, var(--accent-primary) 34%, var(--editor-panel-bg-soft-color));
+  --editor-suggest-item-selected-border-color: var(--accent-primary);
+  --editor-suggest-item-selected-title-color: var(--accent-primary-foreground);
+  --editor-suggest-item-selected-path-color: color-mix(in srgb, var(--accent-primary-foreground) 84%, var(--editor-panel-text-color));
+  --editor-suggest-item-selected-match-bg: color-mix(in srgb, var(--accent-primary-foreground) 18%, transparent);
+  --editor-suggest-item-selected-match-color: var(--accent-primary-foreground);
+  --editor-suggest-item-selected-ref-bg: color-mix(in srgb, var(--accent-primary-foreground) 16%, transparent);
+  --editor-suggest-item-selected-ref-color: var(--accent-primary-foreground);
+  --hljs-keyword: #d73a49;
+  --hljs-string: #032f62;
+  --hljs-number: #005cc5;
+  --hljs-comment: #6a737d;
+  --hljs-type: #6f42c1;
+  --hljs-function: #6f42c1;
+  --hljs-variable: #e36209;
+  --hljs-property: #005cc5;
+  --hljs-operator: #24292e;
+  --hljs-regexp: #032f62;
+  --hljs-meta: #6a737d;
+  --hljs-attribute: #005cc5;
+}
+
 :root {
   --oe-bg: #f6f7f9;
   --oe-surface: #ffffff;
@@ -127,7 +219,7 @@
   min-height: 0;
 }
 
-.oe-read-view {
+.oe-editor .oe-read-view {
   box-sizing: border-box;
   max-width: 820px;
   min-height: 100%;
@@ -136,19 +228,19 @@
   line-height: 1.72;
 }
 
-.oe-read-view h1,
-.oe-read-view h2,
-.oe-read-view h3 {
+.oe-editor .oe-read-view h1,
+.oe-editor .oe-read-view h2,
+.oe-editor .oe-read-view h3 {
   line-height: 1.25;
 }
 
-.oe-read-view code {
+.oe-editor .oe-read-view code {
   padding: 0.1em 0.32em;
   background: #eef2f7;
   border-radius: 4px;
 }
 
-.oe-read-view pre {
+.oe-editor .oe-read-view pre {
   padding: 14px 16px;
   overflow: auto;
   background: #111827;
@@ -156,7 +248,7 @@
   border-radius: 8px;
 }
 
-.oe-read-view blockquote {
+.oe-editor .oe-read-view blockquote {
   margin-left: 0;
   padding-left: 14px;
   color: var(--oe-muted);
