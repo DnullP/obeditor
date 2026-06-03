@@ -27,6 +27,36 @@ async function expectSelectionHighlightVisible(page: Page) {
   expect(background).not.toBe("transparent");
 }
 
+async function focusLastFrontmatterNavigationTarget(page: Page) {
+  if (await page.locator("[data-obeditor-frontmatter-ready='true']").count() === 0) {
+    await page.locator(".cm-line", { hasText: /^Plugin System$/ }).first().click();
+  }
+
+  await expect(page.locator("[data-obeditor-frontmatter-ready='true']")).toBeVisible();
+  await expect.poll(async () => page.evaluate(() =>
+    document.querySelectorAll("[data-frontmatter-vim-nav='true']").length,
+  )).toBeGreaterThan(0);
+
+  await page.evaluate(() => {
+    const targets = Array.from(document.querySelectorAll<HTMLElement>(
+      "[data-frontmatter-vim-nav='true']",
+    ));
+    targets.at(-1)?.focus();
+  });
+}
+
+async function expectEditorFocused(page: Page) {
+  await expect.poll(async () => page.evaluate(() => {
+    const activeElement = document.activeElement;
+    const editorContent = document.querySelector(".oe-code-editor .cm-content");
+    return Boolean(activeElement && editorContent && activeElement === editorContent);
+  })).toBe(true);
+}
+
+async function getActiveLineText(page: Page) {
+  return page.evaluate(() => document.querySelector(".cm-activeLine")?.textContent ?? "");
+}
+
 test("keeps editor state alive across mode switches and saves through the host adapter", async ({ page }) => {
   await page.goto("/");
 
@@ -117,6 +147,42 @@ test("keeps Vim vertical movement connected across rendered markdown tables", as
     section: "body",
     expectedLastRowIndex: "14",
   });
+});
+
+test("lets Vim leave frontmatter navigation with j and continue moving through the editor body", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByLabel("Vim mode").check();
+  await expect(page.locator(".cm-vimMode")).toBeVisible();
+
+  await focusEditor(page);
+  await page.keyboard.press("Escape");
+  await focusLastFrontmatterNavigationTarget(page);
+
+  await expect.poll(async () => page.evaluate(() => {
+    const activeElement = document.activeElement as HTMLElement | null;
+    return activeElement?.dataset.frontmatterVimNav ?? null;
+  })).toBe("true");
+
+  await page.keyboard.press("j");
+  await expectEditorFocused(page);
+
+  await page.keyboard.press("j");
+  await expect.poll(async () => getActiveLineText(page)).toContain("# Plugin System");
+});
+
+test("lets Escape leave frontmatter navigation and restore editor focus at the body anchor", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByLabel("Vim mode").check();
+  await expect(page.locator(".cm-vimMode")).toBeVisible();
+
+  await focusEditor(page);
+  await page.keyboard.press("Escape");
+  await focusLastFrontmatterNavigationTarget(page);
+  await page.keyboard.press("Escape");
+
+  await expectEditorFocused(page);
 });
 
 test("shows selected text highlight in edit mode", async ({ page }) => {

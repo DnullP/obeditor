@@ -6,6 +6,7 @@ import { EditorView, keymap } from "@codemirror/view";
 import { vim } from "@replit/codemirror-vim";
 import { createEditorBaseSetup } from "../core/editorBaseSetup";
 import { createEditorThemeExtension } from "../core/codemirrorTheme";
+import { resolveEditorBodyAnchor } from "../core/editorBodyAnchor";
 import { buildLineNumbersExtension } from "../core/lineNumbersModeExtension";
 import type { EditorService } from "../core/types";
 import { createDefaultMarkdownCodeMirrorExtensions } from "../plugins/defaultMarkdownCodeMirrorExtensions";
@@ -62,6 +63,18 @@ export function CodeMirrorMarkdownSurface({
       blockFrom,
     });
   }, []);
+  const requestExitFrontmatterVimNavigation = useCallback(() => {
+    const view = viewRef.current;
+    if (!view) {
+      return;
+    }
+
+    view.dispatch({
+      selection: { anchor: resolveEditorBodyAnchor(view.state) },
+      scrollIntoView: true,
+    });
+    view.focus();
+  }, []);
   const defaultMarkdownCodeMirrorExtensions = useMemo(() => {
     if (!defaultMarkdownExtensions) {
       return [];
@@ -72,6 +85,7 @@ export function CodeMirrorMarkdownSurface({
       getCurrentDocumentContent: () => service.getSnapshot().document.content,
       canMutateDocument: () => !readOnly,
       capabilities: () => service.getCapabilities(),
+      onRequestExitFrontmatterVimNavigation: requestExitFrontmatterVimNavigation,
       onRequestFocusFrontmatterVimNavigation: (position) => {
         focusWidgetNavigationTarget("frontmatter", position);
       },
@@ -79,7 +93,13 @@ export function CodeMirrorMarkdownSurface({
         focusWidgetNavigationTarget("markdown-table", request.position, request.blockFrom);
       },
     });
-  }, [defaultMarkdownExtensions, focusWidgetNavigationTarget, readOnly, service]);
+  }, [
+    defaultMarkdownExtensions,
+    focusWidgetNavigationTarget,
+    readOnly,
+    requestExitFrontmatterVimNavigation,
+    service,
+  ]);
   const pluginExtensions = useMemo(
     () => service.getCodeMirrorExtensions() as Extension[],
     [service],
