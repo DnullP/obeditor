@@ -277,3 +277,96 @@ test("keeps markdown table source expansion from shifting following content", as
 
   expect(Math.abs(quoteTopAfter - quoteTopBefore)).toBeLessThanOrEqual(80);
 });
+
+test("renders the large table demo with Canvas while preserving editing and Vim navigation", async ({ page }) => {
+  await page.goto("/?demo=large-table");
+
+  await expect(page.getByLabel("Demo note")).toHaveValue("large-table");
+  await expect(page.locator(".oe-toolbar-title")).toContainText("Large Table Canvas.md");
+
+  const table = page.locator(".mtv-table[data-render-engine='canvas']").first();
+  await expect(table).toBeVisible();
+  await expect(table).toHaveAttribute("data-total-body-rows", "720");
+
+  const canvas = page.locator("[data-markdown-table-canvas-layer='true']").first();
+  await expect(canvas).toBeVisible();
+  await page.getByLabel("Vim mode").check();
+  await expect(page.locator(".cm-vimMode")).toBeVisible();
+
+  await expect.poll(async () => page.evaluate(() => {
+    const canvasElement = document.querySelector<HTMLCanvasElement>("[data-markdown-table-canvas-layer='true']");
+    const context = canvasElement?.getContext("2d");
+    if (!canvasElement || !context) {
+      return 0;
+    }
+
+    const imageData = context.getImageData(
+      0,
+      0,
+      Math.min(canvasElement.width, 480),
+      Math.min(canvasElement.height, 240),
+    ).data;
+    let paintedPixels = 0;
+    for (let index = 0; index < imageData.length; index += 4) {
+      const red = imageData[index] ?? 255;
+      const green = imageData[index + 1] ?? 255;
+      const blue = imageData[index + 2] ?? 255;
+      const alpha = imageData[index + 3] ?? 0;
+      if (alpha > 0 && (red < 245 || green < 245 || blue < 245)) {
+        paintedPixels += 1;
+      }
+    }
+    return paintedPixels;
+  })).toBeGreaterThan(0);
+
+  const renderStats = await page.evaluate(() => {
+    const tableElement = document.querySelector<HTMLElement>(".mtv-table[data-render-engine='canvas']");
+    return {
+      totalRows: Number(tableElement?.dataset.totalBodyRows ?? 0),
+      renderedRows: Number(tableElement?.dataset.renderedBodyRows ?? 0),
+      bodyCellCount: tableElement?.querySelectorAll(".mtv-table-body-cell").length ?? 0,
+      entryAnchorCount: tableElement?.querySelectorAll("[data-markdown-table-entry-anchor='true']").length ?? 0,
+    };
+  });
+
+  expect(renderStats.totalRows).toBe(720);
+  expect(renderStats.renderedRows).toBeGreaterThan(0);
+  expect(renderStats.renderedRows).toBeLessThan(renderStats.totalRows);
+  expect(renderStats.bodyCellCount).toBeLessThan(8);
+  expect(renderStats.entryAnchorCount).toBeGreaterThan(0);
+  expect(renderStats.entryAnchorCount).toBeLessThan(120);
+
+  const canvasBounds = await canvas.boundingBox();
+  expect(canvasBounds).not.toBeNull();
+  await page.mouse.click(canvasBounds!.x + 36, canvasBounds!.y + 18);
+
+  const activeInput = page.locator("[data-markdown-table-canvas-active-cell='true'] input").first();
+  await expect(activeInput).toBeVisible();
+  await expect(activeInput).toHaveValue("R-0001");
+
+  await page.keyboard.press("Escape");
+  await expect.poll(async () => page.evaluate(() => {
+    const activeElement = document.activeElement as HTMLElement | null;
+    return {
+      isTableNavigation: activeElement?.dataset.markdownTableVimNav ?? null,
+      rowIndex: activeElement?.dataset.markdownTableRowIndex ?? null,
+      section: activeElement?.dataset.markdownTableSection ?? null,
+    };
+  })).toEqual({
+    isTableNavigation: "true",
+    rowIndex: "0",
+    section: "body",
+  });
+
+  await page.keyboard.press("j");
+  await expect.poll(async () => page.evaluate(() => {
+    const activeElement = document.activeElement as HTMLElement | null;
+    return activeElement?.dataset.markdownTableRowIndex ?? null;
+  })).toBe("1");
+
+  await page.keyboard.press("k");
+  await expect.poll(async () => page.evaluate(() => {
+    const activeElement = document.activeElement as HTMLElement | null;
+    return activeElement?.dataset.markdownTableRowIndex ?? null;
+  })).toBe("0");
+});

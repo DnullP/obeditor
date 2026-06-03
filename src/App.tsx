@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   createDefaultEditorCapabilities,
   createDefaultMarkdownPlugins,
@@ -54,6 +54,119 @@ $$
 - [ ] Try Vim mode if you like modal editing.
 `;
 
+type DemoDocumentId = "plugin-system" | "large-table";
+
+interface DemoDocumentDefinition {
+  id: DemoDocumentId;
+  path: string;
+  title: string;
+  content: string;
+  referenceCount: number;
+}
+
+function createLargeTableDemoContent() {
+  const headers = [
+    "Row",
+    "Area",
+    "Owner",
+    "Status",
+    "Score",
+    "Updated",
+    "Latency",
+    "Volume",
+    "Risk",
+    "Next step",
+  ];
+  const separator = headers.map(() => "---");
+  const areas = ["Editor", "Preview", "Sync", "Index", "Search", "Vim"];
+  const statuses = ["Queued", "Running", "Stable", "Review", "Blocked"];
+  const risks = ["Low", "Medium", "Watch"];
+  const rows = Array.from({ length: 720 }, (_, index) => {
+    const rowNumber = index + 1;
+    return [
+      `R-${String(rowNumber).padStart(4, "0")}`,
+      areas[index % areas.length],
+      `team-${(index % 9) + 1}`,
+      statuses[index % statuses.length],
+      String((rowNumber * 17) % 100),
+      `2026-06-${String((index % 28) + 1).padStart(2, "0")}`,
+      `${24 + (index % 80)} ms`,
+      `${1_000 + index * 13}`,
+      risks[index % risks.length],
+      `Checkpoint ${rowNumber} keeps canvas rendering measurable`,
+    ];
+  });
+
+  return [
+    "---",
+    "title: Large Table Canvas",
+    "tags:",
+    "  - demo",
+    "  - table",
+    "  - performance",
+    "---",
+    "",
+    "# Large Table Canvas",
+    "",
+    "This note exercises the visual table editor with hundreds of rows while keeping editing and Vim handoff active.",
+    "",
+    `| ${headers.join(" | ")} |`,
+    `| ${separator.join(" | ")} |`,
+    ...rows.map((row) => `| ${row.join(" | ")} |`),
+    "",
+    "> The large table above should stay responsive, keep a small DOM footprint, and still allow cell editing.",
+  ].join("\n");
+}
+
+const largeTableDemoContent = createLargeTableDemoContent();
+
+const demoDocuments: Record<DemoDocumentId, DemoDocumentDefinition> = {
+  "plugin-system": {
+    id: "plugin-system",
+    path: "Plugin System.md",
+    title: "Plugin System.md",
+    content: demoContent,
+    referenceCount: 12,
+  },
+  "large-table": {
+    id: "large-table",
+    path: "Large Table Canvas.md",
+    title: "Large Table Canvas.md",
+    content: largeTableDemoContent,
+    referenceCount: 3,
+  },
+};
+
+const demoDocumentOptions: Array<{ value: DemoDocumentId; label: string }> = [
+  { value: "plugin-system", label: "Plugin System" },
+  { value: "large-table", label: "Large Table" },
+];
+
+function resolveInitialDemoDocumentId(): DemoDocumentId {
+  if (typeof window === "undefined") {
+    return "plugin-system";
+  }
+
+  return new URLSearchParams(window.location.search).get("demo") === "large-table"
+    ? "large-table"
+    : "plugin-system";
+}
+
+function createDemoEditorDocument(document: DemoDocumentDefinition) {
+  return {
+    id: document.id,
+    path: document.path,
+    title: document.title,
+    content: document.content,
+  };
+}
+
+function resolveDemoDocumentReferenceCount(pathOrId: string | undefined) {
+  return Object.values(demoDocuments)
+    .find((document) => document.path === pathOrId || document.id === pathOrId)
+    ?.referenceCount ?? 0;
+}
+
 type DemoLineNumbersMode = CodeMirrorLineNumbersMode;
 
 const lineNumberOptions: Array<{ value: DemoLineNumbersMode; label: string }> = [
@@ -63,10 +176,13 @@ const lineNumberOptions: Array<{ value: DemoLineNumbersMode; label: string }> = 
 ];
 
 export function App() {
+  const initialDemoId = useMemo(() => resolveInitialDemoDocumentId(), []);
+  const [selectedDemoId, setSelectedDemoId] = useState<DemoDocumentId>(initialDemoId);
+  const activeDemoDocument = demoDocuments[selectedDemoId];
   const [lineNumbers, setLineNumbers] = useState<DemoLineNumbersMode>("absolute");
   const [vimMode, setVimMode] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
-  const [savedContent, setSavedContent] = useState(demoContent);
+  const [savedContent, setSavedContent] = useState(demoDocuments[initialDemoId].content);
   const [lastOpenedPath, setLastOpenedPath] = useState<string | null>(null);
   const [activeMode, setActiveMode] = useState<EditorMode>("edit");
 
@@ -83,6 +199,12 @@ export function App() {
         title: "Plugin System",
         content: demoContent,
         referenceCount: 12,
+      },
+      {
+        path: "Large Table Canvas.md",
+        title: "Large Table Canvas",
+        content: largeTableDemoContent,
+        referenceCount: 3,
       },
     ],
     translations: {
@@ -101,7 +223,7 @@ export function App() {
         path: document.path ?? document.id,
         title: document.title,
         content: document.content,
-        referenceCount: 12,
+        referenceCount: resolveDemoDocumentReferenceCount(document.path ?? document.id),
       });
       return {
         savedVersion: document.version,
@@ -112,7 +234,7 @@ export function App() {
         path: document.path ?? document.id,
         title: document.title,
         content: document.content,
-        referenceCount: 12,
+        referenceCount: resolveDemoDocumentReferenceCount(document.path ?? document.id),
       });
     },
     onModeChanged: (mode) => {
@@ -124,15 +246,33 @@ export function App() {
   }), [capabilities]);
 
   const service = useMemo(() => createEditorService({
-    document: {
-      id: "demo",
-      path: "Plugin System.md",
-      title: "Plugin System.md",
-      content: demoContent,
-    },
+    document: createDemoEditorDocument(demoDocuments[initialDemoId]),
     adapter,
     plugins: createDefaultMarkdownPlugins(),
-  }), [adapter]);
+  }), [adapter, initialDemoId]);
+
+  useEffect(() => {
+    const nextDocument = createDemoEditorDocument(activeDemoDocument);
+    const currentDocument = service.getSnapshot().document;
+    if (
+      currentDocument.id !== nextDocument.id
+      || currentDocument.path !== nextDocument.path
+      || currentDocument.content !== nextDocument.content
+    ) {
+      service.setDocument(nextDocument);
+    }
+    setSavedContent(activeDemoDocument.content);
+
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (selectedDemoId === "large-table") {
+        url.searchParams.set("demo", "large-table");
+      } else {
+        url.searchParams.delete("demo");
+      }
+      window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+    }
+  }, [activeDemoDocument, selectedDemoId, service]);
 
   return (
     <main className="demo-shell">
@@ -147,6 +287,18 @@ export function App() {
 
         <section className="demo-panel" aria-label="Editor configuration">
           <h2>Editor</h2>
+          <label className="demo-field">
+            <span>Demo note</span>
+            <select
+              aria-label="Demo note"
+              value={selectedDemoId}
+              onChange={(event) => setSelectedDemoId(event.target.value as DemoDocumentId)}
+            >
+              {demoDocumentOptions.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
           <label className="demo-field">
             <span>Line numbers</span>
             <select

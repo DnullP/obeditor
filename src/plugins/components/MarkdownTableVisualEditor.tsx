@@ -67,6 +67,14 @@ import {
     estimateMarkdownTableBodyRowHeights,
 } from "../../markdown/markdownTableRowHeightEstimate";
 import {
+    buildMarkdownTableCanvasOffsets,
+    resolveMarkdownTableCanvasCellGeometry,
+    resolveMarkdownTableCanvasCommands,
+    resolveMarkdownTableCanvasIndexAtOffset,
+    shouldRenderMarkdownTableBodyWithCanvas,
+    sumMarkdownTableCanvasSizes,
+} from "../../markdown/markdownTableCanvasRenderer";
+import {
     getMarkdownTableCellFlatIndex,
     resolveInitialRichPreviewLimit,
 } from "../../markdown/markdownTablePreviewPolicy";
@@ -444,6 +452,19 @@ function deleteTableLayoutSize(values: number[], index: number, defaultValue: nu
     return values.filter((_, valueIndex) => valueIndex !== safeIndex);
 }
 
+function readCanvasCssColor(styles: CSSStyleDeclaration, variableName: string, fallback: string): string {
+    const value = styles.getPropertyValue(variableName).trim();
+    if (!value || value.includes("var(") || value.includes("color-mix(")) {
+        return fallback;
+    }
+
+    return value;
+}
+
+function normalizeCanvasCellText(value: string): string {
+    return value.replace(/\s+/g, " ").trim();
+}
+
 function clampTableCellPosition(
     position: MarkdownTableCellPosition,
     model: MarkdownTableModel,
@@ -561,6 +582,7 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
     const initialRowHeights = resolveInitialRowHeights(props.initialModel, props.initialLayout);
     const wrapperRef = useRef<HTMLDivElement | null>(null);
     const tableScrollRef = useRef<HTMLTableElement | null>(null);
+    const canvasBodyRef = useRef<HTMLCanvasElement | null>(null);
     const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
     const navigationRefs = useRef<Map<string, HTMLDivElement>>(new Map());
     const headerMeasureRef = useRef<HTMLElement | null>(null);
@@ -831,6 +853,38 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
         () => tableModel.rows.slice(virtualRange.startIndex, virtualRange.endIndex),
         [tableModel.rows, virtualRange.endIndex, virtualRange.startIndex],
     );
+    const shouldUseCanvasBodyRenderer = useMemo(
+        () => shouldRenderMarkdownTableBodyWithCanvas(
+            tableModel.rows.length,
+            tableModel.headers.length,
+        ),
+        [tableModel.headers.length, tableModel.rows.length],
+    );
+    const canvasColumnOffsets = useMemo(
+        () => buildMarkdownTableCanvasOffsets(columnWidths),
+        [columnWidths],
+    );
+    const canvasRowOffsets = useMemo(
+        () => buildMarkdownTableCanvasOffsets(bodyRowRenderHeights),
+        [bodyRowRenderHeights],
+    );
+    const tableTotalWidth = useMemo(
+        () => Math.max(1, sumMarkdownTableCanvasSizes(columnWidths)),
+        [columnWidths],
+    );
+    const tableBodyTotalHeight = useMemo(
+        () => Math.max(1, sumMarkdownTableCanvasSizes(bodyRowRenderHeights)),
+        [bodyRowRenderHeights],
+    );
+    const canvasVisibleBodyHeight = useMemo(
+        () => Math.max(
+            1,
+            sumMarkdownTableCanvasSizes(
+                bodyRowRenderHeights.slice(virtualRange.startIndex, virtualRange.endIndex),
+            ),
+        ),
+        [bodyRowRenderHeights, virtualRange.endIndex, virtualRange.startIndex],
+    );
     useEffect(() => {
         tableModelRef.current = tableModel;
     }, [tableModel]);
@@ -838,6 +892,123 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
     useEffect(() => {
         activeCellRef.current = activeCell;
     }, [activeCell]);
+
+    useLayoutEffect(() => {
+        if (!shouldUseCanvasBodyRenderer) {
+            return;
+        }
+
+        const canvas = canvasBodyRef.current;
+        if (!canvas) {
+            return;
+        }
+
+        const cssWidth = Math.max(1, tableTotalWidth);
+        const cssHeight = Math.max(1, canvasVisibleBodyHeight);
+        const pixelRatio = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        const pixelWidth = Math.ceil(cssWidth * pixelRatio);
+        const pixelHeight = Math.ceil(cssHeight * pixelRatio);
+        if (canvas.width !== pixelWidth) {
+            canvas.width = pixelWidth;
+        }
+        if (canvas.height !== pixelHeight) {
+            canvas.height = pixelHeight;
+        }
+
+        const context = canvas.getContext("2d");
+        if (!context) {
+            return;
+        }
+
+        const styles = wrapperRef.current ? getComputedStyle(wrapperRef.current) : null;
+        const bodyBackground = styles
+            ? readCanvasCssColor(styles, "--editor-panel-bg-color", "#ffffff")
+            : "#ffffff";
+        const borderColor = styles
+            ? readCanvasCssColor(styles, "--editor-panel-border-color", "#d8dee8")
+            : "#d8dee8";
+        const textColor = styles?.color || "#1d2430";
+        const mutedTextColor = styles
+            ? readCanvasCssColor(styles, "--editor-panel-muted-text-color", "#6f7b8d")
+            : "#6f7b8d";
+        const selectedBackground = "rgba(47, 111, 237, 0.10)";
+        const activeBackground = "rgba(47, 111, 237, 0.16)";
+        const fontFamily = styles?.fontFamily || "system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+
+        context.save();
+        context.scale(pixelRatio, pixelRatio);
+        context.clearRect(0, 0, cssWidth, cssHeight);
+        context.fillStyle = bodyBackground;
+        context.fillRect(0, 0, cssWidth, cssHeight);
+        context.font = `12px ${fontFamily}`;
+        context.textBaseline = "middle";
+
+        const commands = resolveMarkdownTableCanvasCommands({
+            rows: tableModel.rows,
+            columnWidths,
+            rowHeights: bodyRowRenderHeights,
+            startIndex: virtualRange.startIndex,
+            endIndex: virtualRange.endIndex,
+        });
+
+        commands.forEach((command) => {
+            const top = command.top - virtualRange.beforeHeight;
+            const isSelectedRow = edgeSelection?.kind === "row" && edgeSelection.index === command.rowIndex;
+            const isSelectedColumn = edgeSelection?.kind === "column" && edgeSelection.index === command.columnIndex;
+            const isActiveCell =
+                isTableFocused
+                && activeCell.section === "body"
+                && activeCell.rowIndex === command.rowIndex
+                && activeCell.columnIndex === command.columnIndex;
+
+            if (isSelectedRow || isSelectedColumn || isActiveCell) {
+                context.fillStyle = isActiveCell ? activeBackground : selectedBackground;
+                context.fillRect(command.left, top, command.width, command.height);
+            }
+
+            context.fillStyle = borderColor;
+            context.fillRect(command.left + command.width - 1, top, 1, command.height);
+            context.fillRect(command.left, top + command.height - 1, command.width, 1);
+
+            const text = normalizeCanvasCellText(command.text);
+            if (text.length === 0) {
+                return;
+            }
+
+            context.save();
+            context.beginPath();
+            context.rect(
+                command.left + 8,
+                top + 2,
+                Math.max(0, command.width - 16),
+                Math.max(0, command.height - 4),
+            );
+            context.clip();
+            context.fillStyle = text.length > 0 ? textColor : mutedTextColor;
+            context.fillText(
+                text,
+                command.left + 10,
+                top + command.height / 2,
+                Math.max(0, command.width - 20),
+            );
+            context.restore();
+        });
+
+        context.restore();
+    }, [
+        activeCell,
+        bodyRowRenderHeights,
+        canvasVisibleBodyHeight,
+        columnWidths,
+        edgeSelection,
+        isTableFocused,
+        shouldUseCanvasBodyRenderer,
+        tableModel.rows,
+        tableTotalWidth,
+        virtualRange.beforeHeight,
+        virtualRange.endIndex,
+        virtualRange.startIndex,
+    ]);
 
     useEffect(() => {
         applyColumnWidths((previous) => {
@@ -893,6 +1064,12 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
     }, [tableModel.headers.length]);
 
     useLayoutEffect(() => {
+        if (shouldUseCanvasBodyRenderer) {
+            rowEdgeOffsetsRef.current = [];
+            setRowEdgeOffsets([]);
+            return;
+        }
+
         const updateRowEdgeOffsets = (): void => {
             const nextOffsets = bodyRowRenderHeights.map((_, rowIndex) => {
                 const previousOffset = rowEdgeOffsetsRef.current[rowIndex] ?? 0;
@@ -942,7 +1119,14 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
         return () => {
             observer.disconnect();
         };
-    }, [bodyRowRenderHeights, tableModel.headers.length, virtualRange.endIndex, virtualRange.startIndex, visibleBodyRows.length]);
+    }, [
+        bodyRowRenderHeights,
+        shouldUseCanvasBodyRenderer,
+        tableModel.headers.length,
+        virtualRange.endIndex,
+        virtualRange.startIndex,
+        visibleBodyRows.length,
+    ]);
 
     useLayoutEffect(() => {
         const tableScroll = tableScrollRef.current;
@@ -1841,6 +2025,7 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
             dragState?.kind === "row"
             && dragState.overIndex === rowIndex
             && dragState.fromIndex !== rowIndex;
+        const rowEdgeOffset = shouldUseCanvasBodyRenderer ? 0 : rowEdgeOffsets[rowIndex];
 
         return (
             <button
@@ -1863,8 +2048,8 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
                 }}
                 style={{
                     minHeight: bodyRowRenderHeights[rowIndex] ?? rowHeights[rowIndex] ?? MIN_TABLE_ROW_HEIGHT,
-                    transform: rowEdgeOffsets[rowIndex]
-                        ? `translateY(${rowEdgeOffsets[rowIndex]}px)`
+                    transform: rowEdgeOffset
+                        ? `translateY(${rowEdgeOffset}px)`
                         : undefined,
                 }}
                 onClick={(event) => {
@@ -2196,6 +2381,84 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
         );
     };
 
+    const handleNavigationPreviewKeyDown = (
+        event: KeyboardEvent<HTMLElement>,
+        position: MarkdownTableCellPosition,
+    ): void => {
+        if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
+            return;
+        }
+
+        if (event.key === "Enter") {
+            event.preventDefault();
+            focusCell(position);
+            return;
+        }
+
+        if (event.key === "Escape") {
+            event.preventDefault();
+            props.onRequestExitVimNavigation?.("next");
+            return;
+        }
+
+        if (event.key === "h") {
+            event.preventDefault();
+            focusNavigationCell({
+                ...position,
+                columnIndex: Math.max(0, position.columnIndex - 1),
+            });
+            return;
+        }
+
+        if (event.key === "l") {
+            event.preventDefault();
+            focusNavigationCell({
+                ...position,
+                columnIndex: Math.min(tableModelRef.current.headers.length - 1, position.columnIndex + 1),
+            });
+            return;
+        }
+
+        if (event.key === "j") {
+            event.preventDefault();
+            if (position.section === "header") {
+                focusNavigationCell({ section: "body", rowIndex: 0, columnIndex: position.columnIndex });
+                return;
+            }
+
+            if (position.rowIndex >= Math.max(0, tableModelRef.current.rows.length - 1)) {
+                props.onRequestExitVimNavigation?.("next");
+                return;
+            }
+
+            focusNavigationCell({
+                section: "body",
+                rowIndex: position.rowIndex + 1,
+                columnIndex: position.columnIndex,
+            });
+            return;
+        }
+
+        if (event.key === "k") {
+            event.preventDefault();
+            if (position.section === "header") {
+                props.onRequestExitVimNavigation?.("previous");
+                return;
+            }
+
+            if (position.rowIndex === 0) {
+                focusNavigationCell({ section: "header", rowIndex: 0, columnIndex: position.columnIndex });
+                return;
+            }
+
+            focusNavigationCell({
+                section: "body",
+                rowIndex: position.rowIndex - 1,
+                columnIndex: position.columnIndex,
+            });
+        }
+    };
+
     /**
      * @function renderWikiLinkSuggestPopup
      * @description 渲染当前活动单元格的 WikiLink 补全面板。
@@ -2287,78 +2550,7 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
                     focusCell(position);
                 }}
                 onKeyDown={(event) => {
-                    if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
-                        return;
-                    }
-
-                    if (event.key === "Enter") {
-                        event.preventDefault();
-                        focusCell(position);
-                        return;
-                    }
-
-                    if (event.key === "Escape") {
-                        event.preventDefault();
-                        props.onRequestExitVimNavigation?.("next");
-                        return;
-                    }
-
-                    if (event.key === "h") {
-                        event.preventDefault();
-                        focusNavigationCell({
-                            ...position,
-                            columnIndex: Math.max(0, position.columnIndex - 1),
-                        });
-                        return;
-                    }
-
-                    if (event.key === "l") {
-                        event.preventDefault();
-                        focusNavigationCell({
-                            ...position,
-                            columnIndex: Math.min(tableModelRef.current.headers.length - 1, position.columnIndex + 1),
-                        });
-                        return;
-                    }
-
-                    if (event.key === "j") {
-                        event.preventDefault();
-                        if (position.section === "header") {
-                            focusNavigationCell({ section: "body", rowIndex: 0, columnIndex: position.columnIndex });
-                            return;
-                        }
-
-                        if (position.rowIndex >= Math.max(0, tableModelRef.current.rows.length - 1)) {
-                            props.onRequestExitVimNavigation?.("next");
-                            return;
-                        }
-
-                        focusNavigationCell({
-                            section: "body",
-                            rowIndex: position.rowIndex + 1,
-                            columnIndex: position.columnIndex,
-                        });
-                        return;
-                    }
-
-                    if (event.key === "k") {
-                        event.preventDefault();
-                        if (position.section === "header") {
-                            props.onRequestExitVimNavigation?.("previous");
-                            return;
-                        }
-
-                        if (position.rowIndex === 0) {
-                            focusNavigationCell({ section: "header", rowIndex: 0, columnIndex: position.columnIndex });
-                            return;
-                        }
-
-                        focusNavigationCell({
-                            section: "body",
-                            rowIndex: position.rowIndex - 1,
-                            columnIndex: position.columnIndex,
-                        });
-                    }
+                    handleNavigationPreviewKeyDown(event, position);
                 }}
             >
                 {isEmpty ? (
@@ -2378,6 +2570,246 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
             </div>
         );
     };
+
+    const renderBodyCellSurface = (
+        position: MarkdownTableCellPosition,
+        value: string,
+        isEditingCell: boolean,
+        isNavigationTarget: boolean,
+    ): ReactNode => {
+        const cellKey = buildCellKey(position);
+        return (
+            <>
+                <div className="mtv-cell-frame">
+                    {isEditingCell ? (
+                        <input
+                            ref={(element) => {
+                                if (element) {
+                                    inputRefs.current.set(cellKey, element);
+                                    return;
+                                }
+                                inputRefs.current.delete(cellKey);
+                            }}
+                            type="text"
+                            className="mtv-cell-input"
+                            value={value}
+                            placeholder={t("markdownTable.cellPlaceholder")}
+                            data-active={true}
+                            onFocus={() => {
+                                setActiveCell(position);
+                                handleCellSelectionChange(position);
+                            }}
+                            onClick={() => {
+                                handleCellSelectionChange(position);
+                            }}
+                            onSelect={() => {
+                                handleCellSelectionChange(position);
+                            }}
+                            onKeyDown={(event) => {
+                                handleCellShortcut(event, position);
+                            }}
+                            onChange={(event) => {
+                                handleCellInputChange(event, position);
+                            }}
+                            onCompositionStart={() => {
+                                inputImeCompositionGuard.handleCompositionStart();
+                            }}
+                            onCompositionEnd={() => {
+                                inputImeCompositionGuard.handleCompositionEnd();
+                            }}
+                            onBlur={handleCellInputBlur}
+                        />
+                    ) : renderCellPreview(
+                        position,
+                        value,
+                        t("markdownTable.cellPlaceholder"),
+                        isNavigationTarget,
+                    )}
+                </div>
+                {renderRowResizeHandle(position.rowIndex)}
+                {renderColumnResizeHandle(position.columnIndex)}
+                {renderWikiLinkSuggestPopup(cellKey)}
+            </>
+        );
+    };
+
+    const handleCanvasBodyClick = (event: MouseEvent<HTMLDivElement>): void => {
+        const target = event.target instanceof Element ? event.target : null;
+        if (target?.closest(".mtv-canvas-cell-overlay, .mtv-canvas-row-nav-anchor")) {
+            return;
+        }
+
+        const bounds = event.currentTarget.getBoundingClientRect();
+        const columnIndex = resolveMarkdownTableCanvasIndexAtOffset(
+            columnWidths,
+            event.clientX - bounds.left,
+        );
+        const rowIndex = resolveMarkdownTableCanvasIndexAtOffset(
+            bodyRowRenderHeights,
+            event.clientY - bounds.top,
+        );
+        if (rowIndex < 0 || columnIndex < 0) {
+            return;
+        }
+
+        focusCell({
+            section: "body",
+            rowIndex,
+            columnIndex,
+        });
+    };
+
+    const resolveCanvasBodyCellStyle = (
+        position: MarkdownTableCellPosition,
+    ): CSSProperties | null => {
+        if (position.section !== "body") {
+            return null;
+        }
+
+        const geometry = resolveMarkdownTableCanvasCellGeometry(
+            canvasRowOffsets,
+            canvasColumnOffsets,
+            bodyRowRenderHeights,
+            columnWidths,
+            position.rowIndex,
+            position.columnIndex,
+        );
+        if (!geometry) {
+            return null;
+        }
+
+        return {
+            left: geometry.left,
+            top: geometry.top,
+            width: geometry.width,
+            minHeight: geometry.height,
+            height: geometry.height,
+        };
+    };
+
+    const renderCanvasRowNavigationAnchor = (rowIndex: number): ReactNode => {
+        if (activeCell.section === "body" && activeCell.rowIndex === rowIndex && activeCell.columnIndex === 0) {
+            return null;
+        }
+
+        const position: MarkdownTableCellPosition = {
+            section: "body",
+            rowIndex,
+            columnIndex: 0,
+        };
+        const style = resolveCanvasBodyCellStyle(position);
+        if (!style) {
+            return null;
+        }
+        const cellKey = buildCellKey(position);
+
+        return (
+            <div
+                key={`canvas-nav-anchor-${rowIndex}`}
+                ref={(element) => {
+                    if (element) {
+                        navigationRefs.current.set(cellKey, element);
+                        return;
+                    }
+
+                    navigationRefs.current.delete(cellKey);
+                }}
+                className="mtv-canvas-row-nav-anchor"
+                data-markdown-table-vim-nav={true}
+                data-markdown-table-block-from={props.blockFrom}
+                data-markdown-table-section="body"
+                data-markdown-table-row-index={rowIndex}
+                data-markdown-table-column-index={0}
+                data-markdown-table-entry-anchor={true}
+                tabIndex={-1}
+                style={style}
+                onFocus={() => {
+                    handleNavigationTargetFocus(position);
+                }}
+                onClick={() => {
+                    focusCell(position);
+                }}
+                onKeyDown={(event) => {
+                    handleNavigationPreviewKeyDown(event, position);
+                }}
+            />
+        );
+    };
+
+    const renderCanvasActiveCellOverlay = (): ReactNode => {
+        if (activeCell.section !== "body") {
+            return null;
+        }
+
+        const style = resolveCanvasBodyCellStyle(activeCell);
+        if (!style) {
+            return null;
+        }
+
+        const cellKey = buildCellKey(activeCell);
+        const cellValue = tableModel.rows[activeCell.rowIndex]?.[activeCell.columnIndex] ?? "";
+        const isSelectedColumn = edgeSelection?.kind === "column" && edgeSelection.index === activeCell.columnIndex;
+        const isEditingCell = isTableFocused && interactionMode === "editing";
+        const isNavigationTarget = isTableFocused && interactionMode === "navigation";
+
+        return (
+            <div
+                key={cellKey}
+                className="mtv-canvas-cell-overlay mtv-table-body-cell"
+                data-edge-selected={isSelectedColumn ? true : undefined}
+                data-markdown-table-canvas-active-cell={true}
+                style={style}
+            >
+                {renderBodyCellSurface(
+                    activeCell,
+                    cellValue,
+                    isEditingCell,
+                    isNavigationTarget,
+                )}
+            </div>
+        );
+    };
+
+    const renderCanvasBody = (): ReactNode => (
+        <tr className="mtv-table-canvas-row">
+            <td
+                className="mtv-table-canvas-cell"
+                style={{
+                    gridColumn: `span ${tableModel.headers.length}`,
+                }}
+            >
+                <div
+                    className="mtv-canvas-body-shell"
+                    data-markdown-table-canvas-body={true}
+                    data-total-body-rows={tableModel.rows.length}
+                    data-rendered-canvas-rows={visibleBodyRows.length}
+                    style={{
+                        width: tableTotalWidth,
+                        height: tableBodyTotalHeight,
+                    }}
+                    onClick={handleCanvasBodyClick}
+                >
+                    <canvas
+                        ref={canvasBodyRef}
+                        className="mtv-canvas-body-canvas"
+                        aria-label={t("markdownTable.canvasBodyLabel", {
+                            rowCount: tableModel.rows.length,
+                        })}
+                        data-markdown-table-canvas-layer={true}
+                        style={{
+                            top: virtualRange.beforeHeight,
+                            width: tableTotalWidth,
+                            height: canvasVisibleBodyHeight,
+                        }}
+                    />
+                    {visibleBodyRows.map((_, visibleRowIndex) =>
+                        renderCanvasRowNavigationAnchor(virtualRange.startIndex + visibleRowIndex),
+                    )}
+                    {renderCanvasActiveCellOverlay()}
+                </div>
+            </td>
+        </tr>
+    );
 
     /**
      * @function handleWrapperFocusCapture
@@ -2446,6 +2878,7 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
                             ref={tableScrollRef}
                             className="mtv-table"
                             data-row-virtualized={virtualRange.enabled ? true : undefined}
+                            data-render-engine={shouldUseCanvasBodyRenderer ? "canvas" : "dom"}
                             data-total-body-rows={tableModel.rows.length}
                             data-rendered-body-rows={visibleBodyRows.length}
                             style={columnWidthStyle}
@@ -2528,132 +2961,93 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
                                 </tr>
                             </thead>
                             <tbody>
-                                {virtualRange.enabled && virtualRange.beforeHeight > 0 ? (
-                                    <tr
-                                        className="mtv-table-virtual-spacer-row"
-                                        aria-hidden="true"
-                                        style={{ height: virtualRange.beforeHeight }}
-                                    >
-                                        <td
-                                            className="mtv-table-virtual-spacer-cell"
-                                            style={{
-                                                gridColumn: `span ${tableModel.headers.length}`,
-                                                height: virtualRange.beforeHeight,
-                                            }}
-                                        />
-                                    </tr>
-                                ) : null}
-                                {visibleBodyRows.map((row, visibleRowIndex) => {
-                                    const rowIndex = virtualRange.startIndex + visibleRowIndex;
-                                    return (
-                            <tr
-                                key={`body-row-${rowIndex}`}
-                                className="mtv-table-body-row"
-                                data-edge-selected={edgeSelection?.kind === "row" && edgeSelection.index === rowIndex ? true : undefined}
-                                style={{
-                                    height: bodyRowRenderHeights[rowIndex] ?? rowHeights[rowIndex] ?? MIN_TABLE_ROW_HEIGHT,
-                                }}
-                            >
-                                {row.map((cell, columnIndex) => {
-                                    const position: MarkdownTableCellPosition = {
-                                        section: "body",
-                                        rowIndex,
-                                        columnIndex,
-                                    };
-                                    const cellKey = buildCellKey(position);
-                                    const isActiveCell = buildCellKey(activeCell) === cellKey;
-                                    const isSelectedColumn = edgeSelection?.kind === "column" && edgeSelection.index === columnIndex;
-                                    const isEditingCell = isTableFocused && isActiveCell && interactionMode === "editing";
-                                    const isNavigationTarget = isTableFocused && isActiveCell && interactionMode === "navigation";
-                                    return (
-                                        <td
-                                            key={cellKey}
-                                            className="mtv-table-body-cell"
-                                            data-edge-selected={isSelectedColumn ? true : undefined}
-                                            ref={columnIndex === 0
-                                                ? (element) => {
-                                                    if (element) {
-                                                        bodyMeasureRefs.current.set(rowIndex, element);
-                                                        return;
-                                                    }
+                                {shouldUseCanvasBodyRenderer ? renderCanvasBody() : (
+                                    <>
+                                        {virtualRange.enabled && virtualRange.beforeHeight > 0 ? (
+                                            <tr
+                                                className="mtv-table-virtual-spacer-row"
+                                                aria-hidden="true"
+                                                style={{ height: virtualRange.beforeHeight }}
+                                            >
+                                                <td
+                                                    className="mtv-table-virtual-spacer-cell"
+                                                    style={{
+                                                        gridColumn: `span ${tableModel.headers.length}`,
+                                                        height: virtualRange.beforeHeight,
+                                                    }}
+                                                />
+                                            </tr>
+                                        ) : null}
+                                        {visibleBodyRows.map((row, visibleRowIndex) => {
+                                            const rowIndex = virtualRange.startIndex + visibleRowIndex;
+                                            return (
+                                                <tr
+                                                    key={`body-row-${rowIndex}`}
+                                                    className="mtv-table-body-row"
+                                                    data-edge-selected={edgeSelection?.kind === "row" && edgeSelection.index === rowIndex ? true : undefined}
+                                                    style={{
+                                                        height: bodyRowRenderHeights[rowIndex] ?? rowHeights[rowIndex] ?? MIN_TABLE_ROW_HEIGHT,
+                                                    }}
+                                                >
+                                                    {row.map((cell, columnIndex) => {
+                                                        const position: MarkdownTableCellPosition = {
+                                                            section: "body",
+                                                            rowIndex,
+                                                            columnIndex,
+                                                        };
+                                                        const cellKey = buildCellKey(position);
+                                                        const isActiveCell = buildCellKey(activeCell) === cellKey;
+                                                        const isSelectedColumn = edgeSelection?.kind === "column" && edgeSelection.index === columnIndex;
+                                                        const isEditingCell = isTableFocused && isActiveCell && interactionMode === "editing";
+                                                        const isNavigationTarget = isTableFocused && isActiveCell && interactionMode === "navigation";
+                                                        return (
+                                                            <td
+                                                                key={cellKey}
+                                                                className="mtv-table-body-cell"
+                                                                data-edge-selected={isSelectedColumn ? true : undefined}
+                                                                ref={columnIndex === 0
+                                                                    ? (element) => {
+                                                                        if (element) {
+                                                                            bodyMeasureRefs.current.set(rowIndex, element);
+                                                                            return;
+                                                                        }
 
-                                                    bodyMeasureRefs.current.delete(rowIndex);
-                                                }
-                                                : undefined}
-                                            style={{
-                                                minHeight: bodyRowRenderHeights[rowIndex] ?? rowHeights[rowIndex] ?? MIN_TABLE_ROW_HEIGHT,
-                                            }}
-                                        >
-                                            <div className="mtv-cell-frame">
-                                                {isEditingCell ? (
-                                                    <input
-                                                        ref={(element) => {
-                                                            if (element) {
-                                                                inputRefs.current.set(cellKey, element);
-                                                                return;
-                                                            }
-                                                            inputRefs.current.delete(cellKey);
-                                                        }}
-                                                        type="text"
-                                                        className="mtv-cell-input"
-                                                        value={cell}
-                                                        placeholder={t("markdownTable.cellPlaceholder")}
-                                                        data-active={true}
-                                                        onFocus={() => {
-                                                            setActiveCell(position);
-                                                            handleCellSelectionChange(position);
-                                                        }}
-                                                        onClick={() => {
-                                                            handleCellSelectionChange(position);
-                                                        }}
-                                                        onSelect={() => {
-                                                            handleCellSelectionChange(position);
-                                                        }}
-                                                        onKeyDown={(event) => {
-                                                            handleCellShortcut(event, position);
-                                                        }}
-                                                        onChange={(event) => {
-                                                            handleCellInputChange(event, position);
-                                                        }}
-                                                        onCompositionStart={() => {
-                                                            inputImeCompositionGuard.handleCompositionStart();
-                                                        }}
-                                                        onCompositionEnd={() => {
-                                                            inputImeCompositionGuard.handleCompositionEnd();
-                                                        }}
-                                                        onBlur={handleCellInputBlur}
-                                                    />
-                                                ) : renderCellPreview(
-                                                    position,
-                                                    cell,
-                                                    t("markdownTable.cellPlaceholder"),
-                                                    isNavigationTarget,
-                                                )}
-                                            </div>
-                                            {renderRowResizeHandle(rowIndex)}
-                                            {renderColumnResizeHandle(columnIndex)}
-                                            {renderWikiLinkSuggestPopup(cellKey)}
-                                        </td>
-                                    );
-                                })}
-                            </tr>
-                                    );
-                                })}
-                                {virtualRange.enabled && virtualRange.afterHeight > 0 ? (
-                                    <tr
-                                        className="mtv-table-virtual-spacer-row"
-                                        aria-hidden="true"
-                                        style={{ height: virtualRange.afterHeight }}
-                                    >
-                                        <td
-                                            className="mtv-table-virtual-spacer-cell"
-                                            style={{
-                                                gridColumn: `span ${tableModel.headers.length}`,
-                                                height: virtualRange.afterHeight,
-                                            }}
-                                        />
-                                    </tr>
-                                ) : null}
+                                                                        bodyMeasureRefs.current.delete(rowIndex);
+                                                                    }
+                                                                    : undefined}
+                                                                style={{
+                                                                    minHeight: bodyRowRenderHeights[rowIndex] ?? rowHeights[rowIndex] ?? MIN_TABLE_ROW_HEIGHT,
+                                                                }}
+                                                            >
+                                                                {renderBodyCellSurface(
+                                                                    position,
+                                                                    cell,
+                                                                    isEditingCell,
+                                                                    isNavigationTarget,
+                                                                )}
+                                                            </td>
+                                                        );
+                                                    })}
+                                                </tr>
+                                            );
+                                        })}
+                                        {virtualRange.enabled && virtualRange.afterHeight > 0 ? (
+                                            <tr
+                                                className="mtv-table-virtual-spacer-row"
+                                                aria-hidden="true"
+                                                style={{ height: virtualRange.afterHeight }}
+                                            >
+                                                <td
+                                                    className="mtv-table-virtual-spacer-cell"
+                                                    style={{
+                                                        gridColumn: `span ${tableModel.headers.length}`,
+                                                        height: virtualRange.afterHeight,
+                                                    }}
+                                                />
+                                            </tr>
+                                        ) : null}
+                                    </>
+                                )}
                             </tbody>
                         </table>
                     </div>

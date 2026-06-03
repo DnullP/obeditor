@@ -142,6 +142,63 @@
     min-width: 0;
 }
 
+.mtv-table-canvas-row {
+    display: contents;
+}
+
+.mtv-table-canvas-cell {
+    position: relative;
+    display: block;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: color-mix(in srgb, var(--editor-panel-bg-color) 96%, transparent);
+}
+
+.mtv-canvas-body-shell {
+    position: relative;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--editor-panel-bg-color) 96%, transparent);
+    contain: layout paint style;
+}
+
+.mtv-canvas-body-canvas {
+    position: absolute;
+    left: 0;
+    display: block;
+    pointer-events: auto;
+}
+
+.mtv-canvas-row-nav-anchor,
+.mtv-canvas-cell-overlay {
+    position: absolute;
+    box-sizing: border-box;
+}
+
+.mtv-canvas-row-nav-anchor {
+    z-index: 1;
+    background: transparent;
+    cursor: text;
+    outline: none;
+}
+
+.mtv-canvas-row-nav-anchor:focus-visible {
+    box-shadow:
+        inset 0 0 0 1px var(--editor-suggest-item-hover-border-color),
+        0 0 0 2px color-mix(in srgb, var(--editor-suggest-item-hover-border-color) 34%, transparent);
+}
+
+.mtv-canvas-cell-overlay {
+    z-index: 2;
+}
+
+.mtv-canvas-cell-overlay .mtv-cell-frame,
+.mtv-canvas-cell-overlay .mtv-cell-input,
+.mtv-canvas-cell-overlay .mtv-cell-preview {
+    min-height: inherit;
+    height: 100%;
+}
+
 .mtv-table-head-cell,
 .mtv-table-body-cell {
     position: relative;
@@ -164,6 +221,10 @@
 
 .mtv-table-body-cell {
     background: color-mix(in srgb, var(--editor-panel-bg-color) 96%, transparent);
+}
+
+.mtv-canvas-cell-overlay.mtv-table-body-cell {
+    position: absolute;
 }
 
 .mtv-table-head-cell:first-child,
