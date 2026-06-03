@@ -44,6 +44,7 @@ import {
 import { MarkdownTableVisualEditor } from "../components/MarkdownTableVisualEditor";
 import {
     type BlockSelectionRange,
+    createSourceVisibleBlockReserveLineDecoration,
     rangeTouchesBlock,
 } from "./blockWidgetReplace";
 import {
@@ -494,6 +495,13 @@ function buildMarkdownTableDecorations(
 
     blocks.forEach((block) => {
         if (shouldKeepMarkdownTableSourceVisible(block, state.selection.ranges)) {
+            const reserveDecoration = createSourceVisibleBlockReserveLineDecoration({
+                estimatedWidgetHeight: estimateMarkdownTableWidgetHeight(block.model, block.layout),
+                sourceLineCount: block.endLineNumber - block.startLineNumber + 1,
+            });
+            if (reserveDecoration) {
+                builder.add(block.from, block.from, reserveDecoration);
+            }
             return;
         }
 

@@ -259,6 +259,59 @@ export function handleEditorBodyVimHandoffTextInput(
     return applyResolvedVimHandoff(view, handoffResult, focusWidgetNavigationTarget);
 }
 
+function isWidgetNavigationEventTarget(target: EventTarget | null): boolean {
+    if (typeof Element === "undefined") {
+        return false;
+    }
+
+    if (!(target instanceof Element)) {
+        return false;
+    }
+
+    return Boolean(target.closest([
+        "[data-markdown-table-block-from]",
+        "[data-frontmatter-vim-nav='true']",
+        "[data-frontmatter-field-focusable='true']",
+    ].join(",")));
+}
+
+function handleEditorBodyVimHandoffKeydown(
+    view: EditorView,
+    event: KeyboardEvent,
+    isVimModeEnabled: () => boolean,
+    focusWidgetNavigationTarget: (
+        widget: VimHandoffWidget,
+        position: VimHandoffWidgetPosition,
+        blockFrom?: number,
+    ) => boolean,
+): boolean {
+    if (isWidgetNavigationEventTarget(event.target)) {
+        return false;
+    }
+
+    const vimKey = resolvePlainTextVimKeydownKey(event, false);
+    if (!vimKey) {
+        return false;
+    }
+
+    const handoffResult = resolveEditorBodyVimHandoff({
+        view,
+        key: vimKey,
+        isVimModeEnabled: isVimModeEnabled(),
+    });
+    if (!handoffResult) {
+        return false;
+    }
+
+    if (!applyResolvedVimHandoff(view, handoffResult, focusWidgetNavigationTarget)) {
+        return false;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    return true;
+}
+
 /**
  * @function createVimImeInputPriorityExtension
  * @description 在 Vim 非 insert 命令态中拦截 IME 落下来的单字符文本，让 j/k/h/l 等键仍由 Vim 处理。
@@ -272,22 +325,42 @@ export function createVimImeInputPriorityExtension(
     const handleVimKey = dependencies.handleVimKey ?? ((cm: CodeMirrorLike, key: string) =>
         Vim.handleKey(cm as CodeMirror, key, "user"));
 
-    return Prec.highest(EditorView.inputHandler.of((view, _from, _to, text) => {
-        if (
-            isSinglePlainTextInput(text)
-            && dependencies.isVimModeEnabled
-            && dependencies.focusWidgetNavigationTarget
-            && handleEditorBodyVimHandoffTextInput(
-                view,
-                text,
-                dependencies.isVimModeEnabled,
-                dependencies.focusWidgetNavigationTarget,
-            )
-        ) {
-            return true;
-        }
+    return Prec.highest([
+        EditorView.domEventHandlers({
+            keydown(event, view) {
+                if (
+                    dependencies.isVimModeEnabled
+                    && dependencies.focusWidgetNavigationTarget
+                    && handleEditorBodyVimHandoffKeydown(
+                        view,
+                        event,
+                        dependencies.isVimModeEnabled,
+                        dependencies.focusWidgetNavigationTarget,
+                    )
+                ) {
+                    return true;
+                }
 
-        const cm = getCodeMirrorInstance(view);
-        return handleVimImeTextInput(text, cm, handleVimKey);
-    }));
+                return false;
+            },
+        }),
+        EditorView.inputHandler.of((view, _from, _to, text) => {
+            if (
+                isSinglePlainTextInput(text)
+                && dependencies.isVimModeEnabled
+                && dependencies.focusWidgetNavigationTarget
+                && handleEditorBodyVimHandoffTextInput(
+                    view,
+                    text,
+                    dependencies.isVimModeEnabled,
+                    dependencies.focusWidgetNavigationTarget,
+                )
+            ) {
+                return true;
+            }
+
+            const cm = getCodeMirrorInstance(view);
+            return handleVimImeTextInput(text, cm, handleVimKey);
+        }),
+    ]);
 }

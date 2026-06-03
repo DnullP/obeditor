@@ -4,7 +4,10 @@
  *   负责将正文相邻行上的 `j/k` 导航移交给隐藏表格 widget 的导航层。
  */
 
-import { parseMarkdownTableLines } from "../../../markdown/markdownTableModel";
+import {
+    parseMarkdownTableLayoutComment,
+    parseMarkdownTableLines,
+} from "../../../markdown/markdownTableModel";
 import {
     registerVimHandoff,
     VIM_HANDOFF_PRIORITY,
@@ -82,7 +85,14 @@ function resolveTableBoundaryMatch(
         }
 
         const startLineNumber = lineIndex + 1;
-        const endLineNumber = endLineIndex + 1;
+        let blockEndLineIndex = endLineIndex;
+        if (endLineIndex + 1 < lines.length) {
+            const possibleLayoutLine = lines[endLineIndex + 1] ?? "";
+            if (parseMarkdownTableLayoutComment(possibleLayoutLine)) {
+                blockEndLineIndex = endLineIndex + 1;
+            }
+        }
+        const endLineNumber = blockEndLineIndex + 1;
         const enteredFromAbove = context.key === "j"
             && context.currentLineNumber < startLineNumber
             && areOnlyBlankLinesBetween(lines, context.currentLineNumber, startLineNumber);
@@ -93,7 +103,7 @@ function resolveTableBoundaryMatch(
             && context.currentLineNumber >= startLineNumber
             && context.currentLineNumber <= endLineNumber
             && context.selectionHead >= (lineOffsets[lineIndex] ?? 0)
-            && context.selectionHead <= (lineOffsets[endLineIndex] ?? 0) + (lines[endLineIndex]?.length ?? 0);
+            && context.selectionHead <= (lineOffsets[blockEndLineIndex] ?? 0) + (lines[blockEndLineIndex]?.length ?? 0);
 
         if (enteredFromAbove || enteredFromBelow) {
             return {

@@ -30,6 +30,7 @@ import katex from "katex";
 import { detectExcludedLineRanges } from "../../markdown/markdownBlockDetector";
 import { rangeIntersectsSelection } from "../syntaxRenderRegistry";
 import {
+    createSourceVisibleBlockReserveLineDecoration,
     rangeTouchesBlock,
     type BlockRange,
 } from "./blockWidgetReplace";
@@ -442,6 +443,15 @@ function buildBlockLatexDecorations(
 
     for (const range of ranges) {
         if (rangeTouchesBlock(range, state.selection.ranges)) {
+            const startLine = state.doc.lineAt(range.from);
+            const endLine = state.doc.lineAt(range.to);
+            const reserveDecoration = createSourceVisibleBlockReserveLineDecoration({
+                estimatedWidgetHeight: estimateBlockLatexWidgetHeight(range.latex),
+                sourceLineCount: endLine.number - startLine.number + 1,
+            });
+            if (reserveDecoration) {
+                builder.add(range.from, range.from, reserveDecoration);
+            }
             continue;
         }
 

@@ -859,6 +859,10 @@
   font-size: 0;
 }
 
+.cm-tab-editor .cm-line.cm-source-visible-block-reserve-line {
+  box-sizing: border-box;
+}
+
 .cm-wikilink-suggest-popup {
   position: absolute;
   z-index: 200;

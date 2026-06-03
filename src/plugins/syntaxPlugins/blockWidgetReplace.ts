@@ -85,6 +85,55 @@ export const hiddenBlockAnchorLineDecoration: Decoration = Decoration.line({
     class: "cm-hidden-block-anchor-line",
 });
 
+const SOURCE_VISIBLE_BLOCK_FALLBACK_LINE_HEIGHT = 27;
+
+export interface SourceVisibleBlockReserveOptions {
+    /** Rendered widget height that the source-expanded block should roughly occupy. */
+    estimatedWidgetHeight: number;
+    /** Number of source lines displayed while the widget is expanded back to markdown. */
+    sourceLineCount: number;
+    /** CodeMirror line height used for the other source lines. */
+    lineHeight?: number;
+}
+
+export function resolveSourceVisibleBlockReserveLineMinHeight(
+    options: SourceVisibleBlockReserveOptions,
+): number | null {
+    const sourceLineCount = Math.max(1, Math.floor(options.sourceLineCount));
+    const lineHeightInput = options.lineHeight;
+    const lineHeight = typeof lineHeightInput === "number"
+        && Number.isFinite(lineHeightInput)
+        && lineHeightInput > 0
+        ? lineHeightInput
+        : SOURCE_VISIBLE_BLOCK_FALLBACK_LINE_HEIGHT;
+    const estimatedWidgetHeight = Number.isFinite(options.estimatedWidgetHeight)
+        ? Math.max(0, options.estimatedWidgetHeight)
+        : 0;
+    const naturalSourceHeight = sourceLineCount * lineHeight;
+
+    if (estimatedWidgetHeight <= naturalSourceHeight) {
+        return null;
+    }
+
+    return Math.ceil(estimatedWidgetHeight - ((sourceLineCount - 1) * lineHeight));
+}
+
+export function createSourceVisibleBlockReserveLineDecoration(
+    options: SourceVisibleBlockReserveOptions,
+): Decoration | null {
+    const minHeight = resolveSourceVisibleBlockReserveLineMinHeight(options);
+    if (minHeight === null) {
+        return null;
+    }
+
+    return Decoration.line({
+        class: "cm-source-visible-block-reserve-line",
+        attributes: {
+            style: `min-height:${minHeight}px`,
+        },
+    });
+}
+
 /** 原子范围标记：仅用于 RangeSet 占位，值本身不被使用。 */
 const atomicRangeMarker = Decoration.mark({});
 

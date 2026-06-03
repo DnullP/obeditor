@@ -30,6 +30,7 @@ import { translateEditorTextFromSource } from "../../core/capabilities";
 import { FrontmatterYamlVisualEditor } from "../components/FrontmatterYamlVisualEditor";
 import {
     createBlockAtomicRangesExtension,
+    createSourceVisibleBlockReserveLineDecoration,
     rangeTouchesBlock,
 } from "./blockWidgetReplace";
 import { setExclusionZones } from "../syntaxExclusionZones";
@@ -515,7 +516,18 @@ function buildFrontmatterDecorations(
     options: FrontmatterSyntaxExtensionOptions,
 ): DecorationSet {
     const builder = new RangeSetBuilder<Decoration>();
-    if (!block || shouldKeepFrontmatterSourceVisible(block, state.selection.ranges)) {
+    if (!block) {
+        return builder.finish();
+    }
+
+    if (shouldKeepFrontmatterSourceVisible(block, state.selection.ranges)) {
+        const reserveDecoration = createSourceVisibleBlockReserveLineDecoration({
+            estimatedWidgetHeight: estimateFrontmatterWidgetHeight(block.yamlText),
+            sourceLineCount: block.endLineNumber - block.startLineNumber + 1,
+        });
+        if (reserveDecoration) {
+            builder.add(block.from, block.from, reserveDecoration);
+        }
         return builder.finish();
     }
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { markdown } from "@codemirror/lang-markdown";
 import { indentWithTab } from "@codemirror/commands";
 import { EditorState, type Extension } from "@codemirror/state";
@@ -9,6 +9,9 @@ import { createEditorThemeExtension } from "../core/codemirrorTheme";
 import { buildLineNumbersExtension } from "../core/lineNumbersModeExtension";
 import type { EditorService } from "../core/types";
 import { createDefaultMarkdownCodeMirrorExtensions } from "../plugins/defaultMarkdownCodeMirrorExtensions";
+import { focusDefaultMarkdownWidgetVimNavigationTarget } from "../plugins/defaultMarkdownWidgetNavigation";
+import { createVimImeInputPriorityExtension } from "../plugins/handoff/vimImeInputPriorityExtension";
+import type { VimHandoffWidget, VimHandoffWidgetPosition } from "../plugins/handoff/vimHandoffRegistry";
 import { useEditorSnapshot } from "../react/useEditorSnapshot";
 
 export type CodeMirrorLineNumbersMode = "off" | "absolute" | "relative";
@@ -43,6 +46,22 @@ export function CodeMirrorMarkdownSurface({
   const applyingExternalChangeRef = useRef(false);
   const snapshot = useEditorSnapshot(service);
   const lineNumbersMode = normalizeLineNumbersMode(lineNumbers);
+  const focusWidgetNavigationTarget = useCallback((
+    widget: VimHandoffWidget,
+    position: VimHandoffWidgetPosition,
+    blockFrom?: number,
+  ) => {
+    const root = hostRef.current;
+    if (!root) {
+      return false;
+    }
+
+    return focusDefaultMarkdownWidgetVimNavigationTarget(root, {
+      widget,
+      position,
+      blockFrom,
+    });
+  }, []);
   const defaultMarkdownCodeMirrorExtensions = useMemo(() => {
     if (!defaultMarkdownExtensions) {
       return [];
@@ -53,8 +72,14 @@ export function CodeMirrorMarkdownSurface({
       getCurrentDocumentContent: () => service.getSnapshot().document.content,
       canMutateDocument: () => !readOnly,
       capabilities: () => service.getCapabilities(),
+      onRequestFocusFrontmatterVimNavigation: (position) => {
+        focusWidgetNavigationTarget("frontmatter", position);
+      },
+      onRequestFocusMarkdownTableVimNavigation: (request) => {
+        focusWidgetNavigationTarget("markdown-table", request.position, request.blockFrom);
+      },
     });
-  }, [defaultMarkdownExtensions, readOnly, service]);
+  }, [defaultMarkdownExtensions, focusWidgetNavigationTarget, readOnly, service]);
   const pluginExtensions = useMemo(
     () => service.getCodeMirrorExtensions() as Extension[],
     [service],
@@ -75,13 +100,19 @@ export function CodeMirrorMarkdownSurface({
     const state = EditorState.create({
       doc: service.getSnapshot().document.content,
       extensions: [
-        createEditorBaseSetup({ drawSelection: !vimMode }),
+        createEditorBaseSetup(),
         markdown(),
         createEditorThemeExtension(),
         EditorView.lineWrapping,
         keymap.of([indentWithTab]),
         buildLineNumbersExtension(lineNumbersMode),
         vimMode ? vim() : [],
+        vimMode
+          ? createVimImeInputPriorityExtension({
+            isVimModeEnabled: () => vimMode,
+            focusWidgetNavigationTarget,
+          })
+          : [],
         readOnly ? EditorState.readOnly.of(true) : [],
         updateListener,
         ...defaultMarkdownCodeMirrorExtensions,
@@ -101,7 +132,15 @@ export function CodeMirrorMarkdownSurface({
       view.destroy();
       viewRef.current = null;
     };
-  }, [defaultMarkdownCodeMirrorExtensions, lineNumbersMode, pluginExtensions, readOnly, service, vimMode]);
+  }, [
+    defaultMarkdownCodeMirrorExtensions,
+    focusWidgetNavigationTarget,
+    lineNumbersMode,
+    pluginExtensions,
+    readOnly,
+    service,
+    vimMode,
+  ]);
 
   useEffect(() => {
     const view = viewRef.current;

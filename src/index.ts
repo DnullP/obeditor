@@ -527,13 +527,16 @@ export type {
 } from "./plugins/syntaxPlugins/wikiLinkPreviewExtension";
 export {
   createBlockAtomicRangesExtension,
+  createSourceVisibleBlockReserveLineDecoration,
   hiddenBlockAnchorLineDecoration,
   hiddenBlockLineDecoration,
   rangeTouchesBlock,
+  resolveSourceVisibleBlockReserveLineMinHeight,
 } from "./plugins/syntaxPlugins/blockWidgetReplace";
 export type {
   BlockRange,
   BlockSelectionRange,
+  SourceVisibleBlockReserveOptions,
 } from "./plugins/syntaxPlugins/blockWidgetReplace";
 export {
   MarkdownTableVisualEditor,

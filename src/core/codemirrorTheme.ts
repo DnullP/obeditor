@@ -52,7 +52,8 @@ export function createEditorThemeExtension() {
         background: "var(--editor-selection-bg-color, var(--oe-editor-selection, rgba(47, 111, 237, 0.28))) !important",
       },
       ".cm-line ::selection, .cm-line::selection": {
-        backgroundColor: "transparent !important",
+        backgroundColor: "var(--editor-selection-bg-color, var(--oe-editor-selection, rgba(47, 111, 237, 0.28))) !important",
+        color: "var(--editor-selection-text-color, inherit)",
       },
       ".cm-gutters": {
         color: "var(--oe-editor-muted)",

@@ -120,6 +120,36 @@ describe("builtin vim handoffs", () => {
         });
     });
 
+    test("markdown table body handoff should include table layout metadata when entering from below", () => {
+        cleanupCallbacks.push(registerMarkdownTableBodyVimHandoff());
+
+        expect(resolveRegisteredVimHandoff({
+            surface: "editor-body",
+            key: "k",
+            markdown: [
+                "Before",
+                "| Name | Status |",
+                "| --- | --- |",
+                "| Demo | Open |",
+                "<!-- obeditor-table-layout: {\"columns\":[226,164],\"rows\":[38]} -->",
+                "",
+                "After paragraph",
+            ].join("\n"),
+            currentLineNumber: 7,
+            selectionHead: 0,
+            hasFrontmatter: false,
+            firstBodyLineNumber: 1,
+            isVimEnabled: true,
+            isVimNormalMode: true,
+        })).toEqual({
+            kind: "focus-widget-navigation",
+            widget: "markdown-table",
+            position: "last",
+            blockFrom: 7,
+            reason: "enter-markdown-table-from-body",
+        });
+    });
+
     test("markdown table source handoff should preserve upward entry to the last row anchor", () => {
         cleanupCallbacks.push(registerMarkdownTableBodyVimHandoff());
 
