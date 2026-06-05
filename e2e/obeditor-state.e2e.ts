@@ -278,6 +278,56 @@ test("keeps markdown table source expansion from shifting following content", as
   expect(Math.abs(quoteTopAfter - quoteTopBefore)).toBeLessThanOrEqual(80);
 });
 
+test("reflows table row height while resizing a column instead of squeezing content", async ({ page }) => {
+  await page.goto("/");
+
+  await replaceEditorContent(page, [
+    "# Resize table",
+    "",
+    "| Detail | Status |",
+    "| --- | --- |",
+    "| Long **markdown** content with $x^2 + y^2 = z^2$, `inline code`, and enough prose to require natural wrapping when the column becomes narrow. | Open |",
+    "<!-- obeditor-table-layout: {\"columns\":[420,164]} -->",
+    "",
+    "End.",
+  ].join("\n"));
+
+  const table = page.locator(".cm-markdown-table-widget .mtv-table").first();
+  await expect(table).toBeVisible();
+
+  const measureTable = async () => page.evaluate(() => {
+    const firstHeaderCell = document.querySelector<HTMLElement>(".mtv-table-head-cell");
+    const firstBodyCell = document.querySelector<HTMLElement>(".mtv-table-body-cell");
+    const firstPreview = firstBodyCell?.querySelector<HTMLElement>(".mtv-cell-preview");
+    return {
+      columnWidth: firstHeaderCell?.getBoundingClientRect().width ?? 0,
+      bodyCellHeight: firstBodyCell?.getBoundingClientRect().height ?? 0,
+      previewScrollHeight: firstPreview?.scrollHeight ?? 0,
+      previewClientHeight: firstPreview?.clientHeight ?? 0,
+    };
+  });
+
+  const before = await measureTable();
+  const resizeHandle = page.locator(".mtv-table-head-cell [data-table-resize-kind='column']").first();
+  const handleBounds = await resizeHandle.boundingBox();
+  expect(handleBounds).not.toBeNull();
+
+  await page.mouse.move(handleBounds!.x + handleBounds!.width / 2, handleBounds!.y + handleBounds!.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(handleBounds!.x - 300, handleBounds!.y + handleBounds!.height / 2);
+  await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+  const during = await measureTable();
+  await page.mouse.up();
+  await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+  const after = await measureTable();
+
+  expect(during.columnWidth).toBeLessThan(before.columnWidth - 200);
+  expect(during.bodyCellHeight).toBeGreaterThan(before.bodyCellHeight + 40);
+  expect(after.columnWidth).toBeLessThan(before.columnWidth - 200);
+  expect(after.bodyCellHeight).toBeGreaterThan(before.bodyCellHeight + 40);
+  expect(after.previewScrollHeight).toBeLessThanOrEqual(after.previewClientHeight + 1);
+});
+
 test("renders the large table demo with Canvas while preserving editing and Vim navigation", async ({ page }) => {
   await page.goto("/?demo=large-table");
 

@@ -65,6 +65,7 @@ import {
 import {
     MARKDOWN_TABLE_MIN_ROW_HEIGHT,
     estimateMarkdownTableBodyRowHeights,
+    estimateMarkdownTableRowHeight,
 } from "../../markdown/markdownTableRowHeightEstimate";
 import {
     buildMarkdownTableCanvasOffsets,
@@ -418,14 +419,33 @@ function resolveInitialRowHeights(
     );
 }
 
+interface BuildMarkdownTableLayoutOptions {
+    includeColumnWidths: boolean;
+    includeRowHeights: boolean;
+}
+
 function buildMarkdownTableLayout(
     columnWidths: number[],
     rowHeights: number[],
-): MarkdownTableLayout {
-    return {
-        columnWidths: columnWidths.map((width) => Math.max(MIN_TABLE_COLUMN_WIDTH, Math.round(width))),
-        rowHeights: rowHeights.map((height) => Math.max(MIN_TABLE_ROW_HEIGHT, Math.round(height))),
-    };
+    options: BuildMarkdownTableLayoutOptions,
+): MarkdownTableLayout | null {
+    const layout: MarkdownTableLayout = {};
+    if (options.includeColumnWidths) {
+        layout.columnWidths = columnWidths.map((width) => Math.max(MIN_TABLE_COLUMN_WIDTH, Math.round(width)));
+    }
+    if (options.includeRowHeights) {
+        layout.rowHeights = rowHeights.map((height) => Math.max(MIN_TABLE_ROW_HEIGHT, Math.round(height)));
+    }
+
+    return hasMarkdownTableLayout(layout) ? layout : null;
+}
+
+function hasMarkdownTableColumnLayout(layout: MarkdownTableLayout | null | undefined): boolean {
+    return (layout?.columnWidths?.length ?? 0) > 0;
+}
+
+function hasMarkdownTableRowLayout(layout: MarkdownTableLayout | null | undefined): boolean {
+    return (layout?.rowHeights?.length ?? 0) > 0;
 }
 
 function areRowOffsetsEqual(left: readonly number[], right: readonly number[]): boolean {
@@ -605,7 +625,12 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
     const [edgeSelection, setEdgeSelection] = useState<TableEdgeSelection | null>(null);
     const [contextMenuState, setContextMenuState] = useState<TableContextMenuState>(null);
     const [dragState, setDragState] = useState<TableDragState>(null);
-    const [hasCustomLayout, setHasCustomLayout] = useState<boolean>(() => hasMarkdownTableLayout(props.initialLayout));
+    const [, setHasCustomColumnLayout] = useState<boolean>(() =>
+        hasMarkdownTableColumnLayout(props.initialLayout),
+    );
+    const [hasCustomRowLayout, setHasCustomRowLayout] = useState<boolean>(() =>
+        hasMarkdownTableRowLayout(props.initialLayout),
+    );
     const [columnWidths, setColumnWidths] = useState<number[]>(() =>
         initialColumnWidths,
     );
@@ -628,12 +653,14 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
     const columnWidthsRef = useRef<number[]>(initialColumnWidths);
     const rowHeightsRef = useRef<number[]>(initialRowHeights);
     const rowEdgeOffsetsRef = useRef<number[]>([]);
-    const hasCustomLayoutRef = useRef<boolean>(hasCustomLayout);
+    const hasCustomColumnLayoutRef = useRef<boolean>(hasMarkdownTableColumnLayout(props.initialLayout));
+    const hasCustomRowLayoutRef = useRef<boolean>(hasCustomRowLayout);
     const lastCommittedMarkdownRef = useRef<string>(serializeMarkdownTableWithLayout(
         props.initialModel,
-        hasCustomLayoutRef.current
-            ? buildMarkdownTableLayout(initialColumnWidths, initialRowHeights)
-            : null,
+        buildMarkdownTableLayout(initialColumnWidths, initialRowHeights, {
+            includeColumnWidths: hasCustomColumnLayoutRef.current,
+            includeRowHeights: hasCustomRowLayoutRef.current,
+        }),
     ));
     const tableModelRef = useRef<MarkdownTableModel>(props.initialModel);
     const activeCellRef = useRef<MarkdownTableCellPosition>(resolveDefaultActiveCell(props.initialModel));
@@ -837,8 +864,12 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
         [columnWidths],
     );
     const bodyRowRenderHeights = useMemo<number[]>(
-        () => estimateMarkdownTableBodyRowHeights(tableModel, columnWidths, hasCustomLayout ? rowHeights : null),
-        [columnWidths, hasCustomLayout, rowHeights, tableModel],
+        () => estimateMarkdownTableBodyRowHeights(
+            tableModel,
+            columnWidths,
+            hasCustomRowLayout ? rowHeights : null,
+        ),
+        [columnWidths, hasCustomRowLayout, rowHeights, tableModel],
     );
     const virtualRange = useMemo(
         () => resolveMarkdownTableVirtualRange({
@@ -1286,7 +1317,13 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
             const delta = event.clientY - resizeState.startClientY;
             const nextHeights = rowHeightsRef.current.map((height, index) =>
                 index === resizeState.index
-                    ? Math.max(MIN_TABLE_ROW_HEIGHT, resizeState.startSize + delta)
+                    ? Math.max(
+                        estimateMarkdownTableRowHeight(
+                            tableModelRef.current.rows[index] ?? [],
+                            columnWidthsRef.current,
+                        ),
+                        resizeState.startSize + delta,
+                    )
                     : height);
             pendingResizeLayoutRef.current = {
                 columnWidths: columnWidthsRef.current,
@@ -1296,9 +1333,15 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
         };
 
         const handlePointerEnd = (): void => {
-            if (resizeDragStateRef.current) {
-                hasCustomLayoutRef.current = true;
-                setHasCustomLayout(true);
+            const resizeState = resizeDragStateRef.current;
+            if (resizeState) {
+                if (resizeState.kind === "column") {
+                    hasCustomColumnLayoutRef.current = true;
+                    setHasCustomColumnLayout(true);
+                } else {
+                    hasCustomRowLayoutRef.current = true;
+                    setHasCustomRowLayout(true);
+                }
                 applyPendingResizeLayout();
                 resizeDragStateRef.current = null;
                 commitDraftModel();
@@ -1353,9 +1396,10 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
 
         const nextMarkdown = serializeMarkdownTableWithLayout(
             tableModelRef.current,
-            hasCustomLayoutRef.current
-                ? buildMarkdownTableLayout(columnWidthsRef.current, rowHeightsRef.current)
-                : null,
+            buildMarkdownTableLayout(columnWidthsRef.current, rowHeightsRef.current, {
+                includeColumnWidths: hasCustomColumnLayoutRef.current,
+                includeRowHeights: hasCustomRowLayoutRef.current,
+            }),
         );
         if (nextMarkdown === lastCommittedMarkdownRef.current) {
             return;
