@@ -84,6 +84,8 @@
 }
 
 .cm-tab-reader-pre {
+  box-sizing: border-box;
+  max-width: 100%;
   margin: 0 0 1em;
   padding: 0.8em 1em;
   overflow: auto;
@@ -99,14 +101,17 @@
 
 .cm-tab-reader table {
   width: 100%;
+  max-width: 100%;
   margin: 0 0 1em;
   border-collapse: collapse;
+  table-layout: auto;
 }
 
 .cm-tab-reader th,
 .cm-tab-reader td {
   padding: 0.45em 0.65em;
   border: 1px solid var(--editor-panel-border-color);
+  overflow-wrap: anywhere;
 }
 
 .cm-tab-reader-image {
@@ -143,6 +148,8 @@
 }
 
 .cm-read-frontmatter-panel {
+  box-sizing: border-box;
+  max-width: 100%;
   margin: 0 0 1.2em;
   padding: 12px 14px;
   border: 1px solid var(--editor-panel-border-color);
@@ -163,6 +170,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 0;
   margin: 0;
 }
 
@@ -170,14 +178,17 @@
   display: grid;
   grid-template-columns: minmax(120px, 180px) minmax(0, 1fr);
   gap: 12px;
+  min-width: 0;
   margin: 0;
 }
 
 .cm-read-frontmatter-key {
+  min-width: 0;
   margin: 0;
   color: var(--editor-panel-muted-text-color);
   font-size: 12px;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .cm-read-frontmatter-value {
@@ -791,19 +802,24 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: min(100%, calc(100cqw - var(--oe-editor-block-widget-inline-reserve, 96px)));
+  max-width: 100%;
+  min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
   border-radius: 0;
   background: transparent;
+  box-sizing: border-box;
 }
 
 .cm-tab-editor .cm-markdown-table-widget {
   display: block;
-  width: 100%;
+  width: min(100%, calc(100cqw - var(--oe-editor-block-widget-inline-reserve, 96px)));
+  min-width: 0;
   max-width: 100%;
   margin: 8px 0 18px;
-  overflow: visible;
+  overflow: hidden;
   box-sizing: border-box;
 }
 

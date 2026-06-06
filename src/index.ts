@@ -78,6 +78,16 @@ export {
   focusEditorViewPreservingViewport,
 } from "./core/editorActivationFocus";
 export {
+  DOCUMENT_LAYOUT_LIGHTWEIGHT_ATTR,
+  createLayoutLightweightMeasurementController,
+  isDocumentLayoutLightweight,
+  subscribeDocumentLayoutLightweight,
+} from "./core/layoutLightweightSignal";
+export type {
+  DocumentLayoutLightweightListener,
+  LayoutLightweightMeasurementController,
+} from "./core/layoutLightweightSignal";
+export {
   resolveEditorBodyAnchor,
   resolveEditorBodySelectionRange,
 } from "./core/editorBodyAnchor";

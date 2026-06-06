@@ -8,6 +8,7 @@ import { createEditorBaseSetup } from "../core/editorBaseSetup";
 import { createDeferredEditorContentSync } from "../core/editorContentSync";
 import { createEditorThemeExtension } from "../core/codemirrorTheme";
 import { resolveEditorBodyAnchor } from "../core/editorBodyAnchor";
+import { createLayoutLightweightMeasurementController } from "../core/layoutLightweightSignal";
 import { buildLineNumbersExtension } from "../core/lineNumbersModeExtension";
 import type { EditorService } from "../core/types";
 import { createDefaultMarkdownCodeMirrorExtensions } from "../plugins/defaultMarkdownCodeMirrorExtensions";
@@ -170,20 +171,14 @@ export function CodeMirrorMarkdownSurface({
       },
     });
 
-    let resizeFrameId: number | null = null;
-    const requestEditorMeasure = (): void => {
-      if (resizeFrameId !== null) {
-        return;
-      }
-
-      resizeFrameId = window.requestAnimationFrame(() => {
-        resizeFrameId = null;
-        view.requestMeasure();
-      });
-    };
+    const resizeMeasureController = createLayoutLightweightMeasurementController(() => {
+      view.requestMeasure();
+    });
     const resizeObserver = typeof ResizeObserver === "undefined"
       ? null
-      : new ResizeObserver(requestEditorMeasure);
+      : new ResizeObserver(() => {
+        resizeMeasureController.request();
+      });
     resizeObserver?.observe(hostRef.current);
 
     return () => {
@@ -193,9 +188,7 @@ export function CodeMirrorMarkdownSurface({
         contentSyncRef.current = null;
       }
       resizeObserver?.disconnect();
-      if (resizeFrameId !== null) {
-        window.cancelAnimationFrame(resizeFrameId);
-      }
+      resizeMeasureController.dispose();
       service.attachView(null);
       view.destroy();
       viewRef.current = null;

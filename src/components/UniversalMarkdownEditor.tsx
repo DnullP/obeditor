@@ -100,7 +100,7 @@ function UniversalMarkdownEditorSurface({
     <section className={rootClassName} data-mode={snapshot.mode}>
       <EditorToolbar service={service} />
       {snapshot.error ? <div className="oe-editor-error">{snapshot.error}</div> : null}
-      <div className="oe-editor-body">
+      <div className="oe-editor-body" data-mode={snapshot.mode}>
         {snapshot.mode !== "read" ? (
           <div className="oe-editor-pane">
             <CodeMirrorMarkdownSurface

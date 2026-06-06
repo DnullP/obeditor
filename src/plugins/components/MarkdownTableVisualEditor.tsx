@@ -33,6 +33,7 @@ import { createPortal } from "react-dom";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
+import { createLayoutLightweightMeasurementController } from "../../core/layoutLightweightSignal";
 import type {
     EditorCapabilitiesSource,
     EditorWikiLinkSuggestionItem,
@@ -1072,18 +1073,21 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
             setRenderedHeaderHeight((previous) => (previous === nextHeaderHeight ? previous : nextHeaderHeight));
         };
 
-        updateRenderedEdgeHeights();
+        const measurementController = createLayoutLightweightMeasurementController(updateRenderedEdgeHeights);
+        measurementController.flush();
 
         const observedElements = [
             headerMeasureRef.current,
         ].filter((element): element is HTMLElement => element !== null);
 
         if (typeof ResizeObserver === "undefined" || observedElements.length === 0) {
-            return;
+            return () => {
+                measurementController.dispose();
+            };
         }
 
         const observer = new ResizeObserver(() => {
-            updateRenderedEdgeHeights();
+            measurementController.request();
         });
         observedElements.forEach((element) => {
             observer.observe(element);
@@ -1091,6 +1095,7 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
 
         return () => {
             observer.disconnect();
+            measurementController.dispose();
         };
     }, [tableModel.headers.length]);
 
@@ -1130,18 +1135,21 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
             setRowEdgeOffsets(nextOffsets);
         };
 
-        updateRowEdgeOffsets();
+        const measurementController = createLayoutLightweightMeasurementController(updateRowEdgeOffsets);
+        measurementController.flush();
 
         const observedElements = [
             ...Array.from(bodyMeasureRefs.current.values()),
             ...Array.from(rowEdgeRefs.current.values()),
         ];
         if (typeof ResizeObserver === "undefined" || observedElements.length === 0) {
-            return;
+            return () => {
+                measurementController.dispose();
+            };
         }
 
         const observer = new ResizeObserver(() => {
-            updateRowEdgeOffsets();
+            measurementController.request();
         });
         observedElements.forEach((element) => {
             observer.observe(element);
@@ -1149,6 +1157,7 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
 
         return () => {
             observer.disconnect();
+            measurementController.dispose();
         };
     }, [
         bodyRowRenderHeights,
@@ -1183,13 +1192,16 @@ export function MarkdownTableVisualEditor(props: MarkdownTableVisualEditorProps)
             }));
         };
 
-        updateVirtualViewport();
+        const measurementController = createLayoutLightweightMeasurementController(updateVirtualViewport);
+        measurementController.flush();
         const editorScroller = wrapperRef.current?.closest<HTMLElement>(".cm-scroller");
-        editorScroller?.addEventListener("scroll", updateVirtualViewport, { passive: true });
-        window.addEventListener("resize", updateVirtualViewport);
+        const requestVirtualViewportUpdate = (): void => measurementController.request();
+        editorScroller?.addEventListener("scroll", requestVirtualViewportUpdate, { passive: true });
+        window.addEventListener("resize", requestVirtualViewportUpdate);
         return () => {
-            editorScroller?.removeEventListener("scroll", updateVirtualViewport);
-            window.removeEventListener("resize", updateVirtualViewport);
+            editorScroller?.removeEventListener("scroll", requestVirtualViewportUpdate);
+            window.removeEventListener("resize", requestVirtualViewportUpdate);
+            measurementController.dispose();
         };
     }, [bodyRowRenderHeights.length, renderedHeaderHeight, tableModel.headers.length]);
 

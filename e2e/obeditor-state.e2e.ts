@@ -76,6 +76,128 @@ async function getActiveLineText(page: Page) {
   return page.evaluate(() => document.querySelector(".cm-activeLine")?.textContent ?? "");
 }
 
+const responsiveFrontmatterContent = [
+  "---",
+  "title: Responsive Frontmatter Layout Regression With A Very Long Title",
+  "extremelyLongFrontmatterKeyForResponsiveRegression: value-with-a-very-long-token-that-must-not-escape-the-panel",
+  "tags:",
+  "  - responsive-layout",
+  "  - very-long-frontmatter-tag-that-should-clip-inside-the-chip",
+  "published: true",
+  "date: 2026-06-06",
+  "---",
+  "",
+  "# Responsive Layout",
+  "",
+  "The editor should keep metadata, toolbar controls, read mode, and widgets inside the visible editor bounds.",
+  "",
+  "| Column with long markdown content | Status |",
+  "| --- | --- |",
+  "| A table cell with enough content to require horizontal containment on narrow layouts. | Open |",
+  "",
+  "> A following quote should remain visible below the table.",
+].join("\n");
+
+async function collectResponsiveLayoutSnapshot(page: Page) {
+  return page.evaluate(() => {
+    const toRect = (element: Element | null) => {
+      const rect = element?.getBoundingClientRect();
+      return rect
+        ? {
+          left: rect.left,
+          right: rect.right,
+          top: rect.top,
+          bottom: rect.bottom,
+          width: rect.width,
+          height: rect.height,
+        }
+        : null;
+    };
+    const measure = (selector: string, boundarySelector = ".oe-editor") => {
+      const element = document.querySelector<HTMLElement>(selector);
+      const boundary = document.querySelector<HTMLElement>(boundarySelector);
+      const rect = toRect(element);
+      const boundaryRect = toRect(boundary);
+      const style = element ? getComputedStyle(element) : null;
+
+      return {
+        selector,
+        exists: Boolean(element && boundary),
+        rect,
+        boundaryRect,
+        clientWidth: element?.clientWidth ?? 0,
+        scrollWidth: element?.scrollWidth ?? 0,
+        overflowX: style?.overflowX ?? "",
+        overflowsBoundary: Boolean(
+          rect
+          && boundaryRect
+          && (rect.left < boundaryRect.left - 1 || rect.right > boundaryRect.right + 1)
+        ),
+        unmanagedScrollOverflow: Boolean(
+          element
+          && element.scrollWidth > element.clientWidth + 1
+          && style
+          && !["auto", "scroll", "hidden"].includes(style.overflowX)
+        ),
+      };
+    };
+    const rowColumnCounts = Array.from(document.querySelectorAll<HTMLElement>(".fmv-row"))
+      .map((row) => getComputedStyle(row).gridTemplateColumns.trim().split(/\s+/).filter(Boolean).length);
+    const readRowColumnCounts = Array.from(document.querySelectorAll<HTMLElement>(".cm-read-frontmatter-row"))
+      .map((row) => getComputedStyle(row).gridTemplateColumns.trim().split(/\s+/).filter(Boolean).length);
+    const fmvEditor = document.querySelector<HTMLElement>(".fmv-editor");
+    const readView = document.querySelector<HTMLElement>(".oe-read-view");
+    const splitBody = document.querySelector<HTMLElement>(".oe-editor-body[data-mode='split']");
+    const splitBodyStyle = splitBody ? getComputedStyle(splitBody) : null;
+    const splitPaneRects = Array.from(document.querySelectorAll<HTMLElement>(".oe-editor-body[data-mode='split'] .oe-editor-pane"))
+      .map((pane) => toRect(pane));
+
+    return {
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      },
+      checks: [
+        measure(".oe-toolbar"),
+        measure(".oe-code-editor"),
+        measure(".cm-frontmatter-widget"),
+        measure(".fmv-editor"),
+        measure(".fmv-grid"),
+        measure(".fmv-control-shell"),
+        measure(".cm-markdown-table-widget"),
+        measure(".oe-read-view"),
+        measure(".cm-read-frontmatter-panel"),
+      ].filter((entry) => entry.exists),
+      fmvWidth: fmvEditor?.clientWidth ?? 0,
+      rowColumnCounts,
+      dividerDisplay: getComputedStyle(document.querySelector<HTMLElement>(".fmv-kv-divider") ?? document.body).display,
+      readViewWidth: readView?.clientWidth ?? 0,
+      readRowColumnCounts,
+      splitBodyColumns: splitBodyStyle?.gridTemplateColumns ?? null,
+      splitBodyRows: splitBodyStyle?.gridTemplateRows ?? null,
+      splitPaneRects,
+      tableScroll: measure(".mtv-table-x-scroll", ".cm-markdown-table-widget"),
+    };
+  });
+}
+
+function expectNoBoundaryOverflow(snapshot: Awaited<ReturnType<typeof collectResponsiveLayoutSnapshot>>) {
+  const overflowingSelectors = snapshot.checks
+    .filter((entry) => entry.overflowsBoundary || entry.unmanagedScrollOverflow)
+    .map((entry) => ({
+      selector: entry.selector,
+      overflowsBoundary: entry.overflowsBoundary,
+      unmanagedScrollOverflow: entry.unmanagedScrollOverflow,
+      rect: entry.rect,
+      boundaryRect: entry.boundaryRect,
+      clientWidth: entry.clientWidth,
+      scrollWidth: entry.scrollWidth,
+      overflowX: entry.overflowX,
+    }));
+
+  expect(overflowingSelectors).toEqual([]);
+}
+
 test("keeps editor state alive across mode switches and saves through the host adapter", async ({ page }) => {
   await page.goto("/");
 
@@ -132,6 +254,63 @@ test("lets demo shortcuts jump directly to test surfaces without typing URLs", a
   await expect(page.getByLabel("Demo note")).toHaveValue("plugin-system");
   await expect(page.locator(".oe-toolbar-title")).toContainText("Plugin System.md");
   await expect.poll(async () => page.evaluate(() => new URL(window.location.href).search)).toBe("");
+});
+
+test("keeps frontmatter and editor surfaces contained across narrow and short layouts", async ({ page }) => {
+  const failures = collectPageFailures(page);
+  const viewports = [
+    { width: 360, height: 640 },
+    { width: 520, height: 520 },
+    { width: 780, height: 420 },
+  ];
+
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+    await replaceEditorContent(page, responsiveFrontmatterContent);
+    await expect(page.locator("[data-obeditor-frontmatter-ready='true']")).toBeVisible();
+
+    const editSnapshot = await collectResponsiveLayoutSnapshot(page);
+    expectNoBoundaryOverflow(editSnapshot);
+    if (editSnapshot.fmvWidth <= 460) {
+      expect(editSnapshot.rowColumnCounts.every((count) => count === 1)).toBe(true);
+      expect(editSnapshot.dividerDisplay).toBe("none");
+    }
+
+    await page.locator(".cm-scroller").evaluate((element) => {
+      element.scrollTop = 520;
+      element.dispatchEvent(new Event("scroll", { bubbles: true }));
+    });
+    await waitForAnimationFrame(page);
+    await expect(page.locator(".cm-markdown-table-widget").first()).toBeVisible();
+    const tableSnapshot = await collectResponsiveLayoutSnapshot(page);
+    expectNoBoundaryOverflow(tableSnapshot);
+    expect(tableSnapshot.tableScroll.exists).toBe(true);
+    expect(["auto", "scroll", "hidden"]).toContain(tableSnapshot.tableScroll.overflowX);
+
+    await page.getByTitle("Split").click();
+    await expect(page.locator(".oe-editor-body[data-mode='split']")).toBeVisible();
+    await expect(page.locator(".oe-read-view")).toBeVisible();
+    const splitSnapshot = await collectResponsiveLayoutSnapshot(page);
+    expectNoBoundaryOverflow(splitSnapshot);
+    const [editPane, readPane] = splitSnapshot.splitPaneRects;
+    expect(editPane).not.toBeNull();
+    expect(readPane).not.toBeNull();
+    expect(
+      readPane!.top >= editPane!.bottom - 2
+      || readPane!.left >= editPane!.right - 2,
+    ).toBe(true);
+
+    await page.getByTitle("Read").click();
+    await expect(page.locator(".cm-read-frontmatter-panel")).toBeVisible();
+    const readSnapshot = await collectResponsiveLayoutSnapshot(page);
+    expectNoBoundaryOverflow(readSnapshot);
+    if (readSnapshot.readViewWidth <= 520) {
+      expect(readSnapshot.readRowColumnCounts.every((count) => count === 1)).toBe(true);
+    }
+  }
+
+  expect(failures).toEqual([]);
 });
 
 test("keeps Vim vertical movement connected across rendered markdown tables", async ({ page }) => {
@@ -534,36 +713,44 @@ test("keeps the large article editor responsive while its width changes continuo
       contentVisible: boolean;
       editorFocused: boolean;
       renderedLineCount: number;
+      rootIsLightweight: boolean;
     }> = [];
 
-    for (const width of nextWidths) {
-      const startedAt = performance.now();
-      setNativeInputValue(widthControl, width);
-      widthControl.dispatchEvent(new Event("input", { bubbles: true }));
-      widthControl.dispatchEvent(new Event("change", { bubbles: true }));
-      await waitFrame();
+    document.documentElement.setAttribute("data-layout-lightweight", "true");
+    try {
+      for (const width of nextWidths) {
+        const startedAt = performance.now();
+        setNativeInputValue(widthControl, width);
+        widthControl.dispatchEvent(new Event("input", { bubbles: true }));
+        widthControl.dispatchEvent(new Event("change", { bubbles: true }));
+        await waitFrame();
 
-      const editorStage = document.querySelector<HTMLElement>(".demo-editor-stage");
-      const editorElement = document.querySelector<HTMLElement>(".oe-code-editor .cm-editor");
-      const contentElement = document.querySelector<HTMLElement>(".oe-code-editor .cm-content");
-      const contentRect = contentElement?.getBoundingClientRect();
-      collected.push({
-        width,
-        frameMs: performance.now() - startedAt,
-        appliedWidth: Number(editorStage?.dataset.editorWidthPercent ?? 0),
-        editorWidth: editorElement?.getBoundingClientRect().width ?? 0,
-        contentVisible: Boolean(
-          contentElement
-          && contentRect
-          && contentRect.width > 0
-          && contentRect.height > 0
-          && getComputedStyle(contentElement).visibility !== "hidden"
-        ),
-        editorFocused: document.activeElement === contentElement,
-        renderedLineCount: document.querySelectorAll(".oe-code-editor .cm-line").length,
-      });
+        const editorStage = document.querySelector<HTMLElement>(".demo-editor-stage");
+        const editorElement = document.querySelector<HTMLElement>(".oe-code-editor .cm-editor");
+        const contentElement = document.querySelector<HTMLElement>(".oe-code-editor .cm-content");
+        const contentRect = contentElement?.getBoundingClientRect();
+        collected.push({
+          width,
+          frameMs: performance.now() - startedAt,
+          appliedWidth: Number(editorStage?.dataset.editorWidthPercent ?? 0),
+          editorWidth: editorElement?.getBoundingClientRect().width ?? 0,
+          contentVisible: Boolean(
+            contentElement
+            && contentRect
+            && contentRect.width > 0
+            && contentRect.height > 0
+            && getComputedStyle(contentElement).visibility !== "hidden"
+          ),
+          editorFocused: document.activeElement === contentElement,
+          renderedLineCount: document.querySelectorAll(".oe-code-editor .cm-line").length,
+          rootIsLightweight: document.documentElement.getAttribute("data-layout-lightweight") === "true",
+        });
+      }
+    } finally {
+      document.documentElement.removeAttribute("data-layout-lightweight");
     }
 
+    await waitFrame();
     return collected;
   }, widths);
 
@@ -578,7 +765,11 @@ test("keeps the large article editor responsive while its width changes continuo
     expect(sample.editorFocused).toBe(true);
     expect(sample.renderedLineCount).toBeGreaterThan(0);
     expect(sample.renderedLineCount).toBeLessThan(260);
+    expect(sample.rootIsLightweight).toBe(true);
   }
+  await expect.poll(async () => page.evaluate(() =>
+    document.documentElement.getAttribute("data-layout-lightweight"),
+  )).toBeNull();
   expect(failures).toEqual([]);
 });
 
@@ -620,49 +811,57 @@ test("keeps four large article editors visible while quadrant splits resize toge
       maxRenderedLineCount: number;
       editorWidths: number[];
       editorHeights: number[];
+      rootIsLightweight: boolean;
     }> = [];
 
-    for (const { column, row } of resizeSequence) {
-      stage.style.setProperty("--demo-quad-column", `${column}%`);
-      stage.style.setProperty("--demo-quad-row", `${row}%`);
-      stage.dataset.quadColumnPercent = String(column);
-      stage.dataset.quadRowPercent = String(row);
-      await waitFrame();
+    document.documentElement.setAttribute("data-layout-lightweight", "true");
+    try {
+      for (const { column, row } of resizeSequence) {
+        stage.style.setProperty("--demo-quad-column", `${column}%`);
+        stage.style.setProperty("--demo-quad-row", `${row}%`);
+        stage.dataset.quadColumnPercent = String(column);
+        stage.dataset.quadRowPercent = String(row);
+        await waitFrame();
 
-      const editors = Array.from(document.querySelectorAll<HTMLElement>(".demo-quad-editor-cell"));
-      const editorMeasurements = editors.map((editor) => {
-        const root = editor.querySelector<HTMLElement>(".oe-editor");
-        const content = editor.querySelector<HTMLElement>(".cm-content");
-        const rect = root?.getBoundingClientRect();
-        const contentRect = content?.getBoundingClientRect();
-        return {
-          width: rect?.width ?? 0,
-          height: rect?.height ?? 0,
-          renderedLineCount: editor.querySelectorAll(".cm-line").length,
-          visible: Boolean(
-            rect
-            && contentRect
-            && rect.width > 0
-            && rect.height > 0
-            && contentRect.width > 0
-            && contentRect.height > 0
-          ),
-        };
-      });
+        const editors = Array.from(document.querySelectorAll<HTMLElement>(".demo-quad-editor-cell"));
+        const editorMeasurements = editors.map((editor) => {
+          const root = editor.querySelector<HTMLElement>(".oe-editor");
+          const content = editor.querySelector<HTMLElement>(".cm-content");
+          const rect = root?.getBoundingClientRect();
+          const contentRect = content?.getBoundingClientRect();
+          return {
+            width: rect?.width ?? 0,
+            height: rect?.height ?? 0,
+            renderedLineCount: editor.querySelectorAll(".cm-line").length,
+            visible: Boolean(
+              rect
+              && contentRect
+              && rect.width > 0
+              && rect.height > 0
+              && contentRect.width > 0
+              && contentRect.height > 0
+            ),
+          };
+        });
 
-      collected.push({
-        column,
-        row,
-        appliedColumn: Number(stage?.dataset.quadColumnPercent ?? 0),
-        appliedRow: Number(stage?.dataset.quadRowPercent ?? 0),
-        allEditorsVisible: editorMeasurements.every((editor) => editor.visible),
-        totalRenderedLineCount: editorMeasurements.reduce((total, editor) => total + editor.renderedLineCount, 0),
-        maxRenderedLineCount: Math.max(...editorMeasurements.map((editor) => editor.renderedLineCount)),
-        editorWidths: editorMeasurements.map((editor) => editor.width),
-        editorHeights: editorMeasurements.map((editor) => editor.height),
-      });
+        collected.push({
+          column,
+          row,
+          appliedColumn: Number(stage?.dataset.quadColumnPercent ?? 0),
+          appliedRow: Number(stage?.dataset.quadRowPercent ?? 0),
+          allEditorsVisible: editorMeasurements.every((editor) => editor.visible),
+          totalRenderedLineCount: editorMeasurements.reduce((total, editor) => total + editor.renderedLineCount, 0),
+          maxRenderedLineCount: Math.max(...editorMeasurements.map((editor) => editor.renderedLineCount)),
+          editorWidths: editorMeasurements.map((editor) => editor.width),
+          editorHeights: editorMeasurements.map((editor) => editor.height),
+          rootIsLightweight: document.documentElement.getAttribute("data-layout-lightweight") === "true",
+        });
+      }
+    } finally {
+      document.documentElement.removeAttribute("data-layout-lightweight");
     }
 
+    await waitFrame();
     return collected;
   }, sequence);
 
@@ -675,9 +874,13 @@ test("keeps four large article editors visible while quadrant splits resize toge
   );
   for (const sample of samples) {
     expect(sample.allEditorsVisible).toBe(true);
+    expect(sample.rootIsLightweight).toBe(true);
     expect(sample.totalRenderedLineCount).toBeGreaterThan(0);
     expect(sample.totalRenderedLineCount).toBeLessThan(900);
     expect(sample.maxRenderedLineCount).toBeLessThan(260);
   }
+  await expect.poll(async () => page.evaluate(() =>
+    document.documentElement.getAttribute("data-layout-lightweight"),
+  )).toBeNull();
   expect(failures).toEqual([]);
 });

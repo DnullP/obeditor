@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   createDefaultEditorCapabilities,
   createDefaultMarkdownPlugins,
   createEditorService,
+  DOCUMENT_LAYOUT_LIGHTWEIGHT_ATTR,
   UniversalMarkdownEditor,
   type CodeMirrorLineNumbersMode,
   type EditorHostAdapter,
@@ -311,9 +312,25 @@ export function App() {
   const [editorWidthPercent, setEditorWidthPercent] = useState(100);
   const [quadColumnPercent, setQuadColumnPercent] = useState(50);
   const [quadRowPercent, setQuadRowPercent] = useState(50);
+  const layoutLightweightTimerRef = useRef<number | null>(null);
   const runtimeSavedLength = selectedDemoId === "quad-large-articles"
     ? quadLargeArticleDocuments.reduce((total, document) => total + document.content.length, 0)
     : savedContent.length;
+
+  const markDemoLayoutLightweight = (): void => {
+    if (typeof document === "undefined" || typeof window === "undefined") {
+      return;
+    }
+
+    document.documentElement.setAttribute(DOCUMENT_LAYOUT_LIGHTWEIGHT_ATTR, "true");
+    if (layoutLightweightTimerRef.current !== null) {
+      window.clearTimeout(layoutLightweightTimerRef.current);
+    }
+    layoutLightweightTimerRef.current = window.setTimeout(() => {
+      document.documentElement.removeAttribute(DOCUMENT_LAYOUT_LIGHTWEIGHT_ATTR);
+      layoutLightweightTimerRef.current = null;
+    }, 360);
+  };
 
   const capabilities = useMemo(() => createDefaultEditorCapabilities({
     documents: [
@@ -425,6 +442,18 @@ export function App() {
     }
   }, [activeDemoDocument, selectedDemoId, service]);
 
+  useEffect(() => () => {
+    if (
+      typeof window !== "undefined"
+      && layoutLightweightTimerRef.current !== null
+    ) {
+      window.clearTimeout(layoutLightweightTimerRef.current);
+    }
+    if (typeof document !== "undefined") {
+      document.documentElement.removeAttribute(DOCUMENT_LAYOUT_LIGHTWEIGHT_ATTR);
+    }
+  }, []);
+
   return (
     <main className="demo-shell">
       <aside className="demo-sidebar" aria-label="Editor settings">
@@ -485,7 +514,10 @@ export function App() {
                   step="1"
                   type="range"
                   value={quadColumnPercent}
-                  onChange={(event) => setQuadColumnPercent(Number(event.target.value))}
+                  onChange={(event) => {
+                    markDemoLayoutLightweight();
+                    setQuadColumnPercent(Number(event.target.value));
+                  }}
                 />
                 <output>{quadColumnPercent}%</output>
               </label>
@@ -498,7 +530,10 @@ export function App() {
                   step="1"
                   type="range"
                   value={quadRowPercent}
-                  onChange={(event) => setQuadRowPercent(Number(event.target.value))}
+                  onChange={(event) => {
+                    markDemoLayoutLightweight();
+                    setQuadRowPercent(Number(event.target.value));
+                  }}
                 />
                 <output>{quadRowPercent}%</output>
               </label>
@@ -513,7 +548,10 @@ export function App() {
                 step="1"
                 type="range"
                 value={editorWidthPercent}
-                onChange={(event) => setEditorWidthPercent(Number(event.target.value))}
+                onChange={(event) => {
+                  markDemoLayoutLightweight();
+                  setEditorWidthPercent(Number(event.target.value));
+                }}
               />
               <output>{editorWidthPercent}%</output>
             </label>
