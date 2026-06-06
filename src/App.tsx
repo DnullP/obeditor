@@ -234,6 +234,13 @@ const demoDocumentOptions: Array<{ value: DemoSelectionId; label: string }> = [
   { value: "quad-large-articles", label: "Quad Large Articles" },
 ];
 
+const demoShortcutOptions: Array<{ value: DemoSelectionId; label: string }> = [
+  { value: "plugin-system", label: "Baseline" },
+  { value: "large-table", label: "Large Table" },
+  { value: "large-article", label: "Large Article" },
+  { value: "quad-large-articles", label: "Quad Editors" },
+];
+
 function isDemoDocumentId(value: DemoSelectionId): value is DemoDocumentId {
   return value === "plugin-system" || value === "large-table" || value === "large-article";
 }
@@ -443,6 +450,19 @@ export function App() {
               ))}
             </select>
           </label>
+          <nav className="demo-shortcuts" aria-label="Demo shortcuts">
+            {demoShortcutOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className="demo-shortcut-button"
+                aria-current={selectedDemoId === option.value ? "page" : undefined}
+                onClick={() => setSelectedDemoId(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </nav>
           <label className="demo-field">
             <span>Line numbers</span>
             <select

@@ -110,6 +110,30 @@ test("lets the demo sidebar reconfigure line numbers and Vim mode", async ({ pag
   await expect(page.locator(".cm-vimMode")).toBeVisible();
 });
 
+test("lets demo shortcuts jump directly to test surfaces without typing URLs", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByRole("button", { name: "Large Table" }).click();
+  await expect(page.getByLabel("Demo note")).toHaveValue("large-table");
+  await expect(page.locator(".oe-toolbar-title")).toContainText("Large Table Canvas.md");
+  await expect(page).toHaveURL(/demo=large-table/);
+
+  await page.getByRole("button", { name: "Large Article" }).click();
+  await expect(page.getByLabel("Demo note")).toHaveValue("large-article");
+  await expect(page.locator(".oe-toolbar-title")).toContainText("Large Article Performance.md");
+  await expect(page).toHaveURL(/demo=large-article/);
+
+  await page.getByRole("button", { name: "Quad Editors" }).click();
+  await expect(page.getByLabel("Demo note")).toHaveValue("quad-large-articles");
+  await expect(page.locator(".demo-quad-editor-cell")).toHaveCount(4);
+  await expect(page).toHaveURL(/demo=quad-large-articles/);
+
+  await page.getByRole("button", { name: "Baseline" }).click();
+  await expect(page.getByLabel("Demo note")).toHaveValue("plugin-system");
+  await expect(page.locator(".oe-toolbar-title")).toContainText("Plugin System.md");
+  await expect.poll(async () => page.evaluate(() => new URL(window.location.href).search)).toBe("");
+});
+
 test("keeps Vim vertical movement connected across rendered markdown tables", async ({ page }) => {
   await page.goto("/");
 
