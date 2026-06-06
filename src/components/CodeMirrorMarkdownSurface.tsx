@@ -5,6 +5,7 @@ import { EditorState, type Extension } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
 import { vim } from "@replit/codemirror-vim";
 import { createEditorBaseSetup } from "../core/editorBaseSetup";
+import { createDeferredEditorContentSync } from "../core/editorContentSync";
 import { createEditorThemeExtension } from "../core/codemirrorTheme";
 import { resolveEditorBodyAnchor } from "../core/editorBodyAnchor";
 import { buildLineNumbersExtension } from "../core/lineNumbersModeExtension";
@@ -45,6 +46,8 @@ export function CodeMirrorMarkdownSurface({
   const hostRef = useRef<HTMLDivElement | null>(null);
   const viewRef = useRef<EditorView | null>(null);
   const applyingExternalChangeRef = useRef(false);
+  const lastKnownViewContentRef = useRef(service.getSnapshot().document.content);
+  const contentSyncRef = useRef<ReturnType<typeof createDeferredEditorContentSync> | null>(null);
   const snapshot = useEditorSnapshot(service);
   const lineNumbersMode = normalizeLineNumbersMode(lineNumbers);
   const focusWidgetNavigationTarget = useCallback((
@@ -82,7 +85,7 @@ export function CodeMirrorMarkdownSurface({
 
     return createDefaultMarkdownCodeMirrorExtensions({
       getCurrentFilePath: () => service.getSnapshot().document.path ?? "",
-      getCurrentDocumentContent: () => service.getSnapshot().document.content,
+      getCurrentDocumentContent: () => viewRef.current?.state.doc.toString() ?? service.getSnapshot().document.content,
       canMutateDocument: () => !readOnly,
       capabilities: () => service.getCapabilities(),
       onRequestExitFrontmatterVimNavigation: requestExitFrontmatterVimNavigation,
@@ -110,15 +113,31 @@ export function CodeMirrorMarkdownSurface({
       return undefined;
     }
 
+    const contentSync = createDeferredEditorContentSync({
+      reason: "codemirror",
+      readContent: () => {
+        const content = viewRef.current?.state.doc.toString() ?? lastKnownViewContentRef.current;
+        lastKnownViewContentRef.current = content;
+        return content;
+      },
+      applyContent: (content, reason) => {
+        lastKnownViewContentRef.current = content;
+        service.updateContent(content, reason);
+      },
+    });
+    contentSyncRef.current = contentSync;
+
     const updateListener = EditorView.updateListener.of((update) => {
       if (!update.docChanged || applyingExternalChangeRef.current) {
         return;
       }
-      service.updateContent(update.state.doc.toString(), "codemirror");
+      contentSync.requestSync(update.state.doc.length);
     });
 
+    const initialContent = service.getSnapshot().document.content;
+    lastKnownViewContentRef.current = initialContent;
     const state = EditorState.create({
-      doc: service.getSnapshot().document.content,
+      doc: initialContent,
       extensions: [
         createEditorBaseSetup(),
         markdown(),
@@ -145,9 +164,38 @@ export function CodeMirrorMarkdownSurface({
       parent: hostRef.current,
     });
     viewRef.current = view;
-    service.attachView(view);
+    service.attachView(view, {
+      contentSync: {
+        flushPendingContent: (reason) => contentSync.flush(reason ?? "codemirror"),
+      },
+    });
+
+    let resizeFrameId: number | null = null;
+    const requestEditorMeasure = (): void => {
+      if (resizeFrameId !== null) {
+        return;
+      }
+
+      resizeFrameId = window.requestAnimationFrame(() => {
+        resizeFrameId = null;
+        view.requestMeasure();
+      });
+    };
+    const resizeObserver = typeof ResizeObserver === "undefined"
+      ? null
+      : new ResizeObserver(requestEditorMeasure);
+    resizeObserver?.observe(hostRef.current);
 
     return () => {
+      contentSync.flush("unmount");
+      contentSync.cancel();
+      if (contentSyncRef.current === contentSync) {
+        contentSyncRef.current = null;
+      }
+      resizeObserver?.disconnect();
+      if (resizeFrameId !== null) {
+        window.cancelAnimationFrame(resizeFrameId);
+      }
       service.attachView(null);
       view.destroy();
       viewRef.current = null;
@@ -168,20 +216,33 @@ export function CodeMirrorMarkdownSurface({
       return;
     }
 
-    const currentContent = view.state.doc.toString();
-    if (currentContent === snapshot.document.content) {
+    const snapshotContent = snapshot.document.content;
+    if (snapshotContent === lastKnownViewContentRef.current) {
       return;
     }
 
+    if (view.state.doc.length === snapshotContent.length) {
+      const currentContent = view.state.doc.toString();
+      if (currentContent === snapshotContent) {
+        lastKnownViewContentRef.current = snapshotContent;
+        return;
+      }
+    }
+
+    contentSyncRef.current?.cancel();
     applyingExternalChangeRef.current = true;
-    view.dispatch({
-      changes: {
-        from: 0,
-        to: currentContent.length,
-        insert: snapshot.document.content,
-      },
-    });
-    applyingExternalChangeRef.current = false;
+    try {
+      view.dispatch({
+        changes: {
+          from: 0,
+          to: view.state.doc.length,
+          insert: snapshotContent,
+        },
+      });
+      lastKnownViewContentRef.current = snapshotContent;
+    } finally {
+      applyingExternalChangeRef.current = false;
+    }
   }, [snapshot.document.content]);
 
   return <div className="oe-code-editor cm-tab-editor" ref={hostRef} />;

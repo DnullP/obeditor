@@ -2,6 +2,25 @@ import { expect, test, type Page } from "@playwright/test";
 
 const selectAllShortcut = process.platform === "darwin" ? "Meta+A" : "Control+A";
 
+function collectPageFailures(page: Page) {
+  const failures: string[] = [];
+  page.on("pageerror", (error) => {
+    failures.push(error.message);
+  });
+  page.on("console", (message) => {
+    if (message.type() === "error") {
+      failures.push(message.text());
+    }
+  });
+  return failures;
+}
+
+async function waitForAnimationFrame(page: Page) {
+  await page.evaluate(() => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => resolve());
+  }));
+}
+
 async function focusEditor(page: Page) {
   const editor = page.locator(".oe-code-editor .cm-content");
   await editor.evaluate((element) => (element as HTMLElement).focus());
@@ -393,6 +412,10 @@ test("renders the large table demo with Canvas while preserving editing and Vim 
   const activeInput = page.locator("[data-markdown-table-canvas-active-cell='true'] input").first();
   await expect(activeInput).toBeVisible();
   await expect(activeInput).toHaveValue("R-0001");
+  await expect.poll(async () => page.evaluate(() => {
+    const activeElement = document.activeElement;
+    return Boolean(activeElement?.matches("[data-markdown-table-canvas-active-cell='true'] input"));
+  })).toBe(true);
 
   await page.keyboard.press("Escape");
   await expect.poll(async () => page.evaluate(() => {
@@ -419,4 +442,218 @@ test("renders the large table demo with Canvas while preserving editing and Vim 
     const activeElement = document.activeElement as HTMLElement | null;
     return activeElement?.dataset.markdownTableRowIndex ?? null;
   })).toBe("0");
+});
+
+test("batches large article editing sync and flushes latest content before read mode", async ({ page }) => {
+  const failures = collectPageFailures(page);
+  await page.goto("/?demo=large-article");
+
+  await expect(page.getByLabel("Demo note")).toHaveValue("large-article");
+  await expect(page.locator(".oe-toolbar-title")).toContainText("Large Article Performance.md");
+  await expect(page.locator(".oe-code-editor .cm-content")).toBeVisible();
+
+  const initialStats = await page.evaluate(() => window.__OBEDITOR_DEMO_STATS?.documentChangedCount ?? 0);
+  const initialRenderedLineCount = await page.locator(".oe-code-editor .cm-line").count();
+  expect(initialRenderedLineCount).toBeGreaterThan(0);
+  expect(initialRenderedLineCount).toBeLessThan(260);
+
+  await focusEditor(page);
+  await page.keyboard.type("FAST_SYNC_MARKER\n", { delay: 1 });
+  await waitForAnimationFrame(page);
+  await waitForAnimationFrame(page);
+
+  const afterTypingStats = await page.evaluate(() => window.__OBEDITOR_DEMO_STATS?.documentChangedCount ?? 0);
+  expect(afterTypingStats - initialStats).toBeLessThanOrEqual(1);
+
+  await page.getByTitle("Read").click();
+  await expect(page.locator(".oe-read-view")).toContainText("FAST_SYNC_MARKER");
+
+  const afterReadStats = await page.evaluate(() => window.__OBEDITOR_DEMO_STATS?.documentChangedCount ?? 0);
+  expect(afterReadStats - initialStats).toBeLessThanOrEqual(2);
+  expect(failures).toEqual([]);
+});
+
+test("keeps the large article editor responsive while its width changes continuously", async ({ page }) => {
+  const failures = collectPageFailures(page);
+  await page.goto("/?demo=large-article");
+
+  await expect(page.getByLabel("Demo note")).toHaveValue("large-article");
+  await focusEditor(page);
+
+  const widths = [
+    100, 96, 92, 88, 84, 80, 76, 72, 68, 64, 60, 56, 52, 48, 46,
+    52, 58, 64, 70, 76, 82, 88, 94, 100,
+  ];
+  const samples = await page.evaluate(async (nextWidths) => {
+    const widthControl = document.querySelector<HTMLInputElement>("input[aria-label='Editor width']");
+    if (!widthControl) {
+      throw new Error("Editor width control not found");
+    }
+
+    const waitFrame = () => new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+    const setNativeInputValue = (input: HTMLInputElement, value: number): void => {
+      const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+      if (!valueSetter) {
+        input.value = String(value);
+        return;
+      }
+
+      valueSetter.call(input, String(value));
+    };
+    const collected: Array<{
+      width: number;
+      frameMs: number;
+      appliedWidth: number;
+      editorWidth: number;
+      contentVisible: boolean;
+      editorFocused: boolean;
+      renderedLineCount: number;
+    }> = [];
+
+    for (const width of nextWidths) {
+      const startedAt = performance.now();
+      setNativeInputValue(widthControl, width);
+      widthControl.dispatchEvent(new Event("input", { bubbles: true }));
+      widthControl.dispatchEvent(new Event("change", { bubbles: true }));
+      await waitFrame();
+
+      const editorStage = document.querySelector<HTMLElement>(".demo-editor-stage");
+      const editorElement = document.querySelector<HTMLElement>(".oe-code-editor .cm-editor");
+      const contentElement = document.querySelector<HTMLElement>(".oe-code-editor .cm-content");
+      const contentRect = contentElement?.getBoundingClientRect();
+      collected.push({
+        width,
+        frameMs: performance.now() - startedAt,
+        appliedWidth: Number(editorStage?.dataset.editorWidthPercent ?? 0),
+        editorWidth: editorElement?.getBoundingClientRect().width ?? 0,
+        contentVisible: Boolean(
+          contentElement
+          && contentRect
+          && contentRect.width > 0
+          && contentRect.height > 0
+          && getComputedStyle(contentElement).visibility !== "hidden"
+        ),
+        editorFocused: document.activeElement === contentElement,
+        renderedLineCount: document.querySelectorAll(".oe-code-editor .cm-line").length,
+      });
+    }
+
+    return collected;
+  }, widths);
+
+  expect(samples.length).toBe(widths.length);
+  expect(samples.map((sample) => sample.appliedWidth)).toEqual(widths);
+  expect(Math.max(...samples.map((sample) => sample.editorWidth))).toBeGreaterThan(
+    Math.min(...samples.map((sample) => sample.editorWidth)) + 280,
+  );
+  expect(Math.max(...samples.map((sample) => sample.frameMs))).toBeLessThan(250);
+  for (const sample of samples) {
+    expect(sample.contentVisible).toBe(true);
+    expect(sample.editorFocused).toBe(true);
+    expect(sample.renderedLineCount).toBeGreaterThan(0);
+    expect(sample.renderedLineCount).toBeLessThan(260);
+  }
+  expect(failures).toEqual([]);
+});
+
+test("keeps four large article editors visible while quadrant splits resize together", async ({ page }) => {
+  const failures = collectPageFailures(page);
+  await page.goto("/?demo=quad-large-articles");
+
+  await expect(page.getByLabel("Demo note")).toHaveValue("quad-large-articles");
+  await expect(page.locator(".demo-quad-editor-cell")).toHaveCount(4);
+  await expect.poll(async () => page.locator(".demo-quad-editor-cell .cm-content").count()).toBe(4);
+
+  const sequence = [
+    { column: 50, row: 50 },
+    { column: 58, row: 42 },
+    { column: 64, row: 36 },
+    { column: 60, row: 62 },
+    { column: 45, row: 66 },
+    { column: 34, row: 55 },
+    { column: 40, row: 40 },
+    { column: 50, row: 50 },
+  ];
+  const samples = await page.evaluate(async (resizeSequence) => {
+    const stage = document.querySelector<HTMLElement>(".demo-quad-editor-stage");
+    if (!stage) {
+      throw new Error("Quad editor stage not found");
+    }
+
+    const waitFrame = () => new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+
+    const collected: Array<{
+      column: number;
+      row: number;
+      appliedColumn: number;
+      appliedRow: number;
+      allEditorsVisible: boolean;
+      totalRenderedLineCount: number;
+      maxRenderedLineCount: number;
+      editorWidths: number[];
+      editorHeights: number[];
+    }> = [];
+
+    for (const { column, row } of resizeSequence) {
+      stage.style.setProperty("--demo-quad-column", `${column}%`);
+      stage.style.setProperty("--demo-quad-row", `${row}%`);
+      stage.dataset.quadColumnPercent = String(column);
+      stage.dataset.quadRowPercent = String(row);
+      await waitFrame();
+
+      const editors = Array.from(document.querySelectorAll<HTMLElement>(".demo-quad-editor-cell"));
+      const editorMeasurements = editors.map((editor) => {
+        const root = editor.querySelector<HTMLElement>(".oe-editor");
+        const content = editor.querySelector<HTMLElement>(".cm-content");
+        const rect = root?.getBoundingClientRect();
+        const contentRect = content?.getBoundingClientRect();
+        return {
+          width: rect?.width ?? 0,
+          height: rect?.height ?? 0,
+          renderedLineCount: editor.querySelectorAll(".cm-line").length,
+          visible: Boolean(
+            rect
+            && contentRect
+            && rect.width > 0
+            && rect.height > 0
+            && contentRect.width > 0
+            && contentRect.height > 0
+          ),
+        };
+      });
+
+      collected.push({
+        column,
+        row,
+        appliedColumn: Number(stage?.dataset.quadColumnPercent ?? 0),
+        appliedRow: Number(stage?.dataset.quadRowPercent ?? 0),
+        allEditorsVisible: editorMeasurements.every((editor) => editor.visible),
+        totalRenderedLineCount: editorMeasurements.reduce((total, editor) => total + editor.renderedLineCount, 0),
+        maxRenderedLineCount: Math.max(...editorMeasurements.map((editor) => editor.renderedLineCount)),
+        editorWidths: editorMeasurements.map((editor) => editor.width),
+        editorHeights: editorMeasurements.map((editor) => editor.height),
+      });
+    }
+
+    return collected;
+  }, sequence);
+
+  expect(samples.map((sample) => ({ column: sample.appliedColumn, row: sample.appliedRow }))).toEqual(sequence);
+  expect(Math.max(...samples.flatMap((sample) => sample.editorWidths))).toBeGreaterThan(
+    Math.min(...samples.flatMap((sample) => sample.editorWidths)) + 180,
+  );
+  expect(Math.max(...samples.flatMap((sample) => sample.editorHeights))).toBeGreaterThan(
+    Math.min(...samples.flatMap((sample) => sample.editorHeights)) + 180,
+  );
+  for (const sample of samples) {
+    expect(sample.allEditorsVisible).toBe(true);
+    expect(sample.totalRenderedLineCount).toBeGreaterThan(0);
+    expect(sample.totalRenderedLineCount).toBeLessThan(900);
+    expect(sample.maxRenderedLineCount).toBeLessThan(260);
+  }
+  expect(failures).toEqual([]);
 });

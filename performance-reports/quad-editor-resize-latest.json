@@ -1,0 +1,3987 @@
+{
+  "capturedAt": "2026-06-05T12:59:13.482Z",
+  "url": "http://127.0.0.1:4317/?demo=quad-large-articles",
+  "viewport": {
+    "width": 1600,
+    "height": 1100
+  },
+  "documentCharsPerEditor": 277665,
+  "sequence": [
+    {
+      "column": 50,
+      "row": 66
+    },
+    {
+      "column": 52,
+      "row": 66
+    },
+    {
+      "column": 54,
+      "row": 65
+    },
+    {
+      "column": 56,
+      "row": 65
+    },
+    {
+      "column": 58,
+      "row": 64
+    },
+    {
+      "column": 60,
+      "row": 63
+    },
+    {
+      "column": 61,
+      "row": 61
+    },
+    {
+      "column": 63,
+      "row": 60
+    },
+    {
+      "column": 64,
+      "row": 58
+    },
+    {
+      "column": 65,
+      "row": 56
+    },
+    {
+      "column": 66,
+      "row": 54
+    },
+    {
+      "column": 66,
+      "row": 52
+    },
+    {
+      "column": 66,
+      "row": 50
+    },
+    {
+      "column": 66,
+      "row": 48
+    },
+    {
+      "column": 65,
+      "row": 46
+    },
+    {
+      "column": 65,
+      "row": 44
+    },
+    {
+      "column": 64,
+      "row": 42
+    },
+    {
+      "column": 62,
+      "row": 40
+    },
+    {
+      "column": 61,
+      "row": 38
+    },
+    {
+      "column": 59,
+      "row": 37
+    },
+    {
+      "column": 58,
+      "row": 36
+    },
+    {
+      "column": 56,
+      "row": 35
+    },
+    {
+      "column": 54,
+      "row": 34
+    },
+    {
+      "column": 52,
+      "row": 34
+    },
+    {
+      "column": 49,
+      "row": 34
+    },
+    {
+      "column": 47,
+      "row": 34
+    },
+    {
+      "column": 45,
+      "row": 35
+    },
+    {
+      "column": 43,
+      "row": 35
+    },
+    {
+      "column": 41,
+      "row": 36
+    },
+    {
+      "column": 40,
+      "row": 38
+    },
+    {
+      "column": 38,
+      "row": 39
+    },
+    {
+      "column": 37,
+      "row": 41
+    },
+    {
+      "column": 36,
+      "row": 43
+    },
+    {
+      "column": 35,
+      "row": 45
+    },
+    {
+      "column": 34,
+      "row": 47
+    },
+    {
+      "column": 34,
+      "row": 49
+    },
+    {
+      "column": 34,
+      "row": 51
+    },
+    {
+      "column": 34,
+      "row": 53
+    },
+    {
+      "column": 35,
+      "row": 55
+    },
+    {
+      "column": 36,
+      "row": 57
+    },
+    {
+      "column": 37,
+      "row": 59
+    },
+    {
+      "column": 38,
+      "row": 60
+    },
+    {
+      "column": 39,
+      "row": 62
+    },
+    {
+      "column": 41,
+      "row": 63
+    },
+    {
+      "column": 43,
+      "row": 64
+    },
+    {
+      "column": 45,
+      "row": 65
+    },
+    {
+      "column": 47,
+      "row": 66
+    },
+    {
+      "column": 49,
+      "row": 66
+    },
+    {
+      "column": 51,
+      "row": 66
+    },
+    {
+      "column": 53,
+      "row": 66
+    },
+    {
+      "column": 55,
+      "row": 65
+    },
+    {
+      "column": 57,
+      "row": 64
+    },
+    {
+      "column": 59,
+      "row": 63
+    },
+    {
+      "column": 61,
+      "row": 62
+    },
+    {
+      "column": 62,
+      "row": 60
+    },
+    {
+      "column": 63,
+      "row": 59
+    },
+    {
+      "column": 64,
+      "row": 57
+    },
+    {
+      "column": 65,
+      "row": 55
+    },
+    {
+      "column": 66,
+      "row": 53
+    },
+    {
+      "column": 66,
+      "row": 51
+    },
+    {
+      "column": 66,
+      "row": 49
+    },
+    {
+      "column": 66,
+      "row": 47
+    },
+    {
+      "column": 65,
+      "row": 45
+    },
+    {
+      "column": 64,
+      "row": 43
+    },
+    {
+      "column": 63,
+      "row": 41
+    },
+    {
+      "column": 62,
+      "row": 39
+    },
+    {
+      "column": 60,
+      "row": 38
+    },
+    {
+      "column": 59,
+      "row": 36
+    },
+    {
+      "column": 57,
+      "row": 35
+    },
+    {
+      "column": 55,
+      "row": 35
+    },
+    {
+      "column": 53,
+      "row": 34
+    },
+    {
+      "column": 51,
+      "row": 34
+    },
+    {
+      "column": 48,
+      "row": 34
+    },
+    {
+      "column": 46,
+      "row": 34
+    },
+    {
+      "column": 44,
+      "row": 35
+    },
+    {
+      "column": 42,
+      "row": 36
+    },
+    {
+      "column": 41,
+      "row": 37
+    },
+    {
+      "column": 39,
+      "row": 38
+    },
+    {
+      "column": 38,
+      "row": 40
+    },
+    {
+      "column": 36,
+      "row": 42
+    },
+    {
+      "column": 35,
+      "row": 44
+    },
+    {
+      "column": 35,
+      "row": 46
+    },
+    {
+      "column": 34,
+      "row": 48
+    },
+    {
+      "column": 34,
+      "row": 50
+    },
+    {
+      "column": 34,
+      "row": 52
+    },
+    {
+      "column": 34,
+      "row": 54
+    },
+    {
+      "column": 35,
+      "row": 56
+    },
+    {
+      "column": 36,
+      "row": 58
+    },
+    {
+      "column": 37,
+      "row": 60
+    },
+    {
+      "column": 39,
+      "row": 61
+    },
+    {
+      "column": 40,
+      "row": 63
+    },
+    {
+      "column": 42,
+      "row": 64
+    },
+    {
+      "column": 44,
+      "row": 65
+    },
+    {
+      "column": 46,
+      "row": 65
+    },
+    {
+      "column": 48,
+      "row": 66
+    },
+    {
+      "column": 50,
+      "row": 66
+    }
+  ],
+  "samples": [
+    {
+      "column": 50,
+      "row": 66,
+      "appliedColumn": 50,
+      "appliedRow": 66,
+      "frameMs": 3.200000047683716,
+      "editors": [
+        {
+          "width": 640,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 630,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 640,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 630,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 52,
+      "row": 66,
+      "appliedColumn": 52,
+      "appliedRow": 66,
+      "frameMs": 4.200000047683716,
+      "editors": [
+        {
+          "width": 665.59375,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 604.40625,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 665.59375,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 604.40625,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 54,
+      "row": 65,
+      "appliedColumn": 54,
+      "appliedRow": 65,
+      "frameMs": 4.8999998569488525,
+      "editors": [
+        {
+          "width": 691.1875,
+          "height": 698.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 578.8125,
+          "height": 698.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 691.1875,
+          "height": 367.203125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 578.8125,
+          "height": 367.203125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 56,
+      "row": 65,
+      "appliedColumn": 56,
+      "appliedRow": 65,
+      "frameMs": 6.299999952316284,
+      "editors": [
+        {
+          "width": 716.796875,
+          "height": 698.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 553.203125,
+          "height": 698.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 716.796875,
+          "height": 367.203125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 553.203125,
+          "height": 367.203125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 58,
+      "row": 64,
+      "appliedColumn": 58,
+      "appliedRow": 64,
+      "frameMs": 14.400000095367432,
+      "editors": [
+        {
+          "width": 742.390625,
+          "height": 688.078125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 527.609375,
+          "height": 688.078125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 742.390625,
+          "height": 377.921875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 527.609375,
+          "height": 377.921875,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 60,
+      "row": 63,
+      "appliedColumn": 60,
+      "appliedRow": 63,
+      "frameMs": 6.5,
+      "editors": [
+        {
+          "width": 768,
+          "height": 677.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 502,
+          "height": 677.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 768,
+          "height": 388.640625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 502,
+          "height": 388.640625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 61,
+      "row": 61,
+      "appliedColumn": 61,
+      "appliedRow": 61,
+      "frameMs": 20.5,
+      "editors": [
+        {
+          "width": 780.796875,
+          "height": 655.90625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 489.203125,
+          "height": 655.90625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 780.796875,
+          "height": 410.09375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 489.203125,
+          "height": 410.09375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 63,
+      "row": 60,
+      "appliedColumn": 63,
+      "appliedRow": 60,
+      "frameMs": 16.700000047683716,
+      "editors": [
+        {
+          "width": 806.390625,
+          "height": 645.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 463.609375,
+          "height": 645.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 806.390625,
+          "height": 420.8125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 463.609375,
+          "height": 420.8125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 64,
+      "row": 58,
+      "appliedColumn": 64,
+      "appliedRow": 58,
+      "frameMs": 11.900000095367432,
+      "editors": [
+        {
+          "width": 819.1875,
+          "height": 623.75,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 450.8125,
+          "height": 623.75,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 819.1875,
+          "height": 442.25,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 450.8125,
+          "height": 442.25,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 65,
+      "row": 56,
+      "appliedColumn": 65,
+      "appliedRow": 56,
+      "frameMs": 13.700000047683716,
+      "editors": [
+        {
+          "width": 832,
+          "height": 602.3125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 438,
+          "height": 602.3125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 832,
+          "height": 463.6875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 438,
+          "height": 463.6875,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 66,
+      "row": 54,
+      "appliedColumn": 66,
+      "appliedRow": 54,
+      "frameMs": 12,
+      "editors": [
+        {
+          "width": 844.796875,
+          "height": 580.875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 580.875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 844.796875,
+          "height": 485.125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 485.125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 66,
+      "row": 52,
+      "appliedColumn": 66,
+      "appliedRow": 52,
+      "frameMs": 11.299999952316284,
+      "editors": [
+        {
+          "width": 844.796875,
+          "height": 559.4375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 559.4375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 844.796875,
+          "height": 506.5625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 506.5625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 66,
+      "row": 50,
+      "appliedColumn": 66,
+      "appliedRow": 50,
+      "frameMs": 13,
+      "editors": [
+        {
+          "width": 844.796875,
+          "height": 538,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 538,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 844.796875,
+          "height": 528,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 528,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 66,
+      "row": 48,
+      "appliedColumn": 66,
+      "appliedRow": 48,
+      "frameMs": 9.399999856948853,
+      "editors": [
+        {
+          "width": 844.796875,
+          "height": 516.546875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 516.546875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 844.796875,
+          "height": 549.453125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 549.453125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 65,
+      "row": 46,
+      "appliedColumn": 65,
+      "appliedRow": 46,
+      "frameMs": 11.600000143051147,
+      "editors": [
+        {
+          "width": 832,
+          "height": 495.109375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 438,
+          "height": 495.109375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 832,
+          "height": 570.890625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 438,
+          "height": 570.890625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 65,
+      "row": 44,
+      "appliedColumn": 65,
+      "appliedRow": 44,
+      "frameMs": 8.799999952316284,
+      "editors": [
+        {
+          "width": 832,
+          "height": 473.671875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 438,
+          "height": 473.671875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 832,
+          "height": 592.328125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 438,
+          "height": 592.328125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 64,
+      "row": 42,
+      "appliedColumn": 64,
+      "appliedRow": 42,
+      "frameMs": 12.100000143051147,
+      "editors": [
+        {
+          "width": 819.1875,
+          "height": 452.234375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 450.8125,
+          "height": 452.234375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 819.1875,
+          "height": 613.765625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 450.8125,
+          "height": 613.765625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 62,
+      "row": 40,
+      "appliedColumn": 62,
+      "appliedRow": 40,
+      "frameMs": 6.299999952316284,
+      "editors": [
+        {
+          "width": 793.59375,
+          "height": 430.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 476.40625,
+          "height": 430.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 793.59375,
+          "height": 635.203125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 476.40625,
+          "height": 635.203125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 61,
+      "row": 38,
+      "appliedColumn": 61,
+      "appliedRow": 38,
+      "frameMs": 27.299999952316284,
+      "editors": [
+        {
+          "width": 780.796875,
+          "height": 409.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 489.203125,
+          "height": 409.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 780.796875,
+          "height": 656.640625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 489.203125,
+          "height": 656.640625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 59,
+      "row": 37,
+      "appliedColumn": 59,
+      "appliedRow": 37,
+      "frameMs": 16.40000009536743,
+      "editors": [
+        {
+          "width": 755.1875,
+          "height": 398.625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 514.8125,
+          "height": 398.625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 755.1875,
+          "height": 667.375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 514.8125,
+          "height": 667.375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 58,
+      "row": 36,
+      "appliedColumn": 58,
+      "appliedRow": 36,
+      "frameMs": 11.799999952316284,
+      "editors": [
+        {
+          "width": 742.390625,
+          "height": 387.90625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 527.609375,
+          "height": 387.90625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 742.390625,
+          "height": 678.09375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 527.609375,
+          "height": 678.09375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 56,
+      "row": 35,
+      "appliedColumn": 56,
+      "appliedRow": 35,
+      "frameMs": 14.799999952316284,
+      "editors": [
+        {
+          "width": 716.796875,
+          "height": 377.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 553.203125,
+          "height": 377.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 716.796875,
+          "height": 688.8125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 553.203125,
+          "height": 688.8125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 54,
+      "row": 34,
+      "appliedColumn": 54,
+      "appliedRow": 34,
+      "frameMs": 11.200000047683716,
+      "editors": [
+        {
+          "width": 691.1875,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 578.8125,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 691.1875,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 578.8125,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 52,
+      "row": 34,
+      "appliedColumn": 52,
+      "appliedRow": 34,
+      "frameMs": 15.799999952316284,
+      "editors": [
+        {
+          "width": 665.59375,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 604.40625,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 665.59375,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 604.40625,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 49,
+      "row": 34,
+      "appliedColumn": 49,
+      "appliedRow": 34,
+      "frameMs": 7.299999952316284,
+      "editors": [
+        {
+          "width": 627.1875,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 642.8125,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 627.1875,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 642.8125,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 47,
+      "row": 34,
+      "appliedColumn": 47,
+      "appliedRow": 34,
+      "frameMs": 27.700000047683716,
+      "editors": [
+        {
+          "width": 601.59375,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 668.40625,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 601.59375,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 668.40625,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 45,
+      "row": 35,
+      "appliedColumn": 45,
+      "appliedRow": 35,
+      "frameMs": 16.200000047683716,
+      "editors": [
+        {
+          "width": 576,
+          "height": 377.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 694,
+          "height": 377.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 576,
+          "height": 688.8125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 694,
+          "height": 688.8125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 43,
+      "row": 35,
+      "appliedColumn": 43,
+      "appliedRow": 35,
+      "frameMs": 11.900000095367432,
+      "editors": [
+        {
+          "width": 550.390625,
+          "height": 377.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 719.609375,
+          "height": 377.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 550.390625,
+          "height": 688.8125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 719.609375,
+          "height": 688.8125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 41,
+      "row": 36,
+      "appliedColumn": 41,
+      "appliedRow": 36,
+      "frameMs": 14.799999952316284,
+      "editors": [
+        {
+          "width": 524.796875,
+          "height": 387.90625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 745.203125,
+          "height": 387.90625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 524.796875,
+          "height": 678.09375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 745.203125,
+          "height": 678.09375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 40,
+      "row": 38,
+      "appliedColumn": 40,
+      "appliedRow": 38,
+      "frameMs": 12.299999952316284,
+      "editors": [
+        {
+          "width": 512,
+          "height": 409.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 758,
+          "height": 409.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 512,
+          "height": 656.640625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 758,
+          "height": 656.640625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 38,
+      "row": 39,
+      "appliedColumn": 38,
+      "appliedRow": 39,
+      "frameMs": 13.900000095367432,
+      "editors": [
+        {
+          "width": 486.390625,
+          "height": 420.078125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 783.609375,
+          "height": 420.078125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 486.390625,
+          "height": 645.921875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 783.609375,
+          "height": 645.921875,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 37,
+      "row": 41,
+      "appliedColumn": 37,
+      "appliedRow": 41,
+      "frameMs": 10,
+      "editors": [
+        {
+          "width": 473.59375,
+          "height": 441.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 796.40625,
+          "height": 441.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 473.59375,
+          "height": 624.484375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 796.40625,
+          "height": 624.484375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 36,
+      "row": 43,
+      "appliedColumn": 36,
+      "appliedRow": 43,
+      "frameMs": 13.099999904632568,
+      "editors": [
+        {
+          "width": 460.796875,
+          "height": 462.953125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 809.203125,
+          "height": 462.953125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 460.796875,
+          "height": 603.046875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 809.203125,
+          "height": 603.046875,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 35,
+      "row": 45,
+      "appliedColumn": 35,
+      "appliedRow": 45,
+      "frameMs": 9.100000143051147,
+      "editors": [
+        {
+          "width": 448,
+          "height": 484.390625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 822,
+          "height": 484.390625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 448,
+          "height": 581.609375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 822,
+          "height": 581.609375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 34,
+      "row": 47,
+      "appliedColumn": 34,
+      "appliedRow": 47,
+      "frameMs": 12.200000047683716,
+      "editors": [
+        {
+          "width": 435.1875,
+          "height": 505.828125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 505.828125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 435.1875,
+          "height": 560.171875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 560.171875,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 34,
+      "row": 49,
+      "appliedColumn": 34,
+      "appliedRow": 49,
+      "frameMs": 11.199999809265137,
+      "editors": [
+        {
+          "width": 435.1875,
+          "height": 527.265625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 527.265625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 435.1875,
+          "height": 538.734375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 538.734375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 34,
+      "row": 51,
+      "appliedColumn": 34,
+      "appliedRow": 51,
+      "frameMs": 13.800000190734863,
+      "editors": [
+        {
+          "width": 435.1875,
+          "height": 548.71875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 548.71875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 435.1875,
+          "height": 517.28125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 517.28125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 34,
+      "row": 53,
+      "appliedColumn": 34,
+      "appliedRow": 53,
+      "frameMs": 7,
+      "editors": [
+        {
+          "width": 435.1875,
+          "height": 570.15625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 570.15625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 435.1875,
+          "height": 495.84375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 495.84375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 35,
+      "row": 55,
+      "appliedColumn": 35,
+      "appliedRow": 55,
+      "frameMs": 25.90000009536743,
+      "editors": [
+        {
+          "width": 448,
+          "height": 591.59375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 822,
+          "height": 591.59375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 448,
+          "height": 474.40625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 822,
+          "height": 474.40625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 36,
+      "row": 57,
+      "appliedColumn": 36,
+      "appliedRow": 57,
+      "frameMs": 17.899999856948853,
+      "editors": [
+        {
+          "width": 460.796875,
+          "height": 613.03125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 809.203125,
+          "height": 613.03125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 460.796875,
+          "height": 452.96875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 809.203125,
+          "height": 452.96875,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 37,
+      "row": 59,
+      "appliedColumn": 37,
+      "appliedRow": 59,
+      "frameMs": 9.799999952316284,
+      "editors": [
+        {
+          "width": 473.59375,
+          "height": 634.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 796.40625,
+          "height": 634.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 473.59375,
+          "height": 431.53125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 796.40625,
+          "height": 431.53125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 38,
+      "row": 60,
+      "appliedColumn": 38,
+      "appliedRow": 60,
+      "frameMs": 17,
+      "editors": [
+        {
+          "width": 486.390625,
+          "height": 645.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 783.609375,
+          "height": 645.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 486.390625,
+          "height": 420.8125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 783.609375,
+          "height": 420.8125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 39,
+      "row": 62,
+      "appliedColumn": 39,
+      "appliedRow": 62,
+      "frameMs": 8.799999952316284,
+      "editors": [
+        {
+          "width": 499.1875,
+          "height": 666.625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 770.8125,
+          "height": 666.625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 499.1875,
+          "height": 399.375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 770.8125,
+          "height": 399.375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 41,
+      "row": 63,
+      "appliedColumn": 41,
+      "appliedRow": 63,
+      "frameMs": 15.700000047683716,
+      "editors": [
+        {
+          "width": 524.796875,
+          "height": 677.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 745.203125,
+          "height": 677.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 524.796875,
+          "height": 388.640625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 745.203125,
+          "height": 388.640625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 43,
+      "row": 64,
+      "appliedColumn": 43,
+      "appliedRow": 64,
+      "frameMs": 8.600000143051147,
+      "editors": [
+        {
+          "width": 550.390625,
+          "height": 688.078125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 719.609375,
+          "height": 688.078125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 550.390625,
+          "height": 377.921875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 719.609375,
+          "height": 377.921875,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 45,
+      "row": 65,
+      "appliedColumn": 45,
+      "appliedRow": 65,
+      "frameMs": 14,
+      "editors": [
+        {
+          "width": 576,
+          "height": 698.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 694,
+          "height": 698.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 576,
+          "height": 367.203125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 694,
+          "height": 367.203125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 47,
+      "row": 66,
+      "appliedColumn": 47,
+      "appliedRow": 66,
+      "frameMs": 7.599999904632568,
+      "editors": [
+        {
+          "width": 601.59375,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 668.40625,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 601.59375,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 668.40625,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 49,
+      "row": 66,
+      "appliedColumn": 49,
+      "appliedRow": 66,
+      "frameMs": 25.300000190734863,
+      "editors": [
+        {
+          "width": 627.1875,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 642.8125,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 627.1875,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 642.8125,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 51,
+      "row": 66,
+      "appliedColumn": 51,
+      "appliedRow": 66,
+      "frameMs": 18.40000009536743,
+      "editors": [
+        {
+          "width": 652.796875,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 617.203125,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 652.796875,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 617.203125,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 53,
+      "row": 66,
+      "appliedColumn": 53,
+      "appliedRow": 66,
+      "frameMs": 10.299999952316284,
+      "editors": [
+        {
+          "width": 678.390625,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 591.609375,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 678.390625,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 591.609375,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 55,
+      "row": 65,
+      "appliedColumn": 55,
+      "appliedRow": 65,
+      "frameMs": 16.700000047683716,
+      "editors": [
+        {
+          "width": 704,
+          "height": 698.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 566,
+          "height": 698.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 704,
+          "height": 367.203125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 566,
+          "height": 367.203125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 57,
+      "row": 64,
+      "appliedColumn": 57,
+      "appliedRow": 64,
+      "frameMs": 9.299999952316284,
+      "editors": [
+        {
+          "width": 729.59375,
+          "height": 688.078125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 540.40625,
+          "height": 688.078125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 729.59375,
+          "height": 377.921875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 540.40625,
+          "height": 377.921875,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 59,
+      "row": 63,
+      "appliedColumn": 59,
+      "appliedRow": 63,
+      "frameMs": 15.399999856948853,
+      "editors": [
+        {
+          "width": 755.1875,
+          "height": 677.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 514.8125,
+          "height": 677.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 755.1875,
+          "height": 388.640625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 514.8125,
+          "height": 388.640625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 61,
+      "row": 62,
+      "appliedColumn": 61,
+      "appliedRow": 62,
+      "frameMs": 9.200000047683716,
+      "editors": [
+        {
+          "width": 780.796875,
+          "height": 666.625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 489.203125,
+          "height": 666.625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 780.796875,
+          "height": 399.375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 489.203125,
+          "height": 399.375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 62,
+      "row": 60,
+      "appliedColumn": 62,
+      "appliedRow": 60,
+      "frameMs": 26.40000009536743,
+      "editors": [
+        {
+          "width": 793.59375,
+          "height": 645.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 476.40625,
+          "height": 645.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 793.59375,
+          "height": 420.8125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 476.40625,
+          "height": 420.8125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 63,
+      "row": 59,
+      "appliedColumn": 63,
+      "appliedRow": 59,
+      "frameMs": 15.5,
+      "editors": [
+        {
+          "width": 806.390625,
+          "height": 634.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 463.609375,
+          "height": 634.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 806.390625,
+          "height": 431.53125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 463.609375,
+          "height": 431.53125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 64,
+      "row": 57,
+      "appliedColumn": 64,
+      "appliedRow": 57,
+      "frameMs": 14.200000047683716,
+      "editors": [
+        {
+          "width": 819.1875,
+          "height": 613.03125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 450.8125,
+          "height": 613.03125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 819.1875,
+          "height": 452.96875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 450.8125,
+          "height": 452.96875,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 65,
+      "row": 55,
+      "appliedColumn": 65,
+      "appliedRow": 55,
+      "frameMs": 12.599999904632568,
+      "editors": [
+        {
+          "width": 832,
+          "height": 591.59375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 438,
+          "height": 591.59375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 832,
+          "height": 474.40625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 438,
+          "height": 474.40625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 66,
+      "row": 53,
+      "appliedColumn": 66,
+      "appliedRow": 53,
+      "frameMs": 13.399999856948853,
+      "editors": [
+        {
+          "width": 844.796875,
+          "height": 570.15625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 570.15625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 844.796875,
+          "height": 495.84375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 495.84375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 66,
+      "row": 51,
+      "appliedColumn": 66,
+      "appliedRow": 51,
+      "frameMs": 14.300000190734863,
+      "editors": [
+        {
+          "width": 844.796875,
+          "height": 548.71875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 548.71875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 844.796875,
+          "height": 517.28125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 517.28125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 66,
+      "row": 49,
+      "appliedColumn": 66,
+      "appliedRow": 49,
+      "frameMs": 9.399999856948853,
+      "editors": [
+        {
+          "width": 844.796875,
+          "height": 527.265625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 527.265625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 844.796875,
+          "height": 538.734375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 538.734375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 66,
+      "row": 47,
+      "appliedColumn": 66,
+      "appliedRow": 47,
+      "frameMs": 13.700000047683716,
+      "editors": [
+        {
+          "width": 844.796875,
+          "height": 505.828125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 505.828125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 844.796875,
+          "height": 560.171875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 425.203125,
+          "height": 560.171875,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 65,
+      "row": 45,
+      "appliedColumn": 65,
+      "appliedRow": 45,
+      "frameMs": 7.900000095367432,
+      "editors": [
+        {
+          "width": 832,
+          "height": 484.390625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 438,
+          "height": 484.390625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 832,
+          "height": 581.609375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 438,
+          "height": 581.609375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 64,
+      "row": 43,
+      "appliedColumn": 64,
+      "appliedRow": 43,
+      "frameMs": 27,
+      "editors": [
+        {
+          "width": 819.1875,
+          "height": 462.953125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 450.8125,
+          "height": 462.953125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 819.1875,
+          "height": 603.046875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 450.8125,
+          "height": 603.046875,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 63,
+      "row": 41,
+      "appliedColumn": 63,
+      "appliedRow": 41,
+      "frameMs": 17.09999990463257,
+      "editors": [
+        {
+          "width": 806.390625,
+          "height": 441.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 463.609375,
+          "height": 441.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 806.390625,
+          "height": 624.484375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 463.609375,
+          "height": 624.484375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 62,
+      "row": 39,
+      "appliedColumn": 62,
+      "appliedRow": 39,
+      "frameMs": 10.599999904632568,
+      "editors": [
+        {
+          "width": 793.59375,
+          "height": 420.078125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 476.40625,
+          "height": 420.078125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 793.59375,
+          "height": 645.921875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 476.40625,
+          "height": 645.921875,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 60,
+      "row": 38,
+      "appliedColumn": 60,
+      "appliedRow": 38,
+      "frameMs": 14.800000190734863,
+      "editors": [
+        {
+          "width": 768,
+          "height": 409.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 502,
+          "height": 409.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 768,
+          "height": 656.640625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 502,
+          "height": 656.640625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 59,
+      "row": 36,
+      "appliedColumn": 59,
+      "appliedRow": 36,
+      "frameMs": 10.400000095367432,
+      "editors": [
+        {
+          "width": 755.1875,
+          "height": 387.90625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 514.8125,
+          "height": 387.90625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 755.1875,
+          "height": 678.09375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 514.8125,
+          "height": 678.09375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 57,
+      "row": 35,
+      "appliedColumn": 57,
+      "appliedRow": 35,
+      "frameMs": 13.899999856948853,
+      "editors": [
+        {
+          "width": 729.59375,
+          "height": 377.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 540.40625,
+          "height": 377.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 729.59375,
+          "height": 688.8125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 540.40625,
+          "height": 688.8125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 55,
+      "row": 35,
+      "appliedColumn": 55,
+      "appliedRow": 35,
+      "frameMs": 9.399999856948853,
+      "editors": [
+        {
+          "width": 704,
+          "height": 377.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 566,
+          "height": 377.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 704,
+          "height": 688.8125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 566,
+          "height": 688.8125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 53,
+      "row": 34,
+      "appliedColumn": 53,
+      "appliedRow": 34,
+      "frameMs": 12.600000143051147,
+      "editors": [
+        {
+          "width": 678.390625,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 591.609375,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 678.390625,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 591.609375,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 51,
+      "row": 34,
+      "appliedColumn": 51,
+      "appliedRow": 34,
+      "frameMs": 8.099999904632568,
+      "editors": [
+        {
+          "width": 652.796875,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 617.203125,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 652.796875,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 617.203125,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 48,
+      "row": 34,
+      "appliedColumn": 48,
+      "appliedRow": 34,
+      "frameMs": 27.200000047683716,
+      "editors": [
+        {
+          "width": 614.390625,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 655.609375,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 614.390625,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 655.609375,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 46,
+      "row": 34,
+      "appliedColumn": 46,
+      "appliedRow": 34,
+      "frameMs": 18.5,
+      "editors": [
+        {
+          "width": 588.796875,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 681.203125,
+          "height": 366.46875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 588.796875,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 681.203125,
+          "height": 699.53125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 44,
+      "row": 35,
+      "appliedColumn": 44,
+      "appliedRow": 35,
+      "frameMs": 9.799999952316284,
+      "editors": [
+        {
+          "width": 563.1875,
+          "height": 377.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 706.8125,
+          "height": 377.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 563.1875,
+          "height": 688.8125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 706.8125,
+          "height": 688.8125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 42,
+      "row": 36,
+      "appliedColumn": 42,
+      "appliedRow": 36,
+      "frameMs": 16,
+      "editors": [
+        {
+          "width": 537.59375,
+          "height": 387.90625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 732.40625,
+          "height": 387.90625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 537.59375,
+          "height": 678.09375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 732.40625,
+          "height": 678.09375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 41,
+      "row": 37,
+      "appliedColumn": 41,
+      "appliedRow": 37,
+      "frameMs": 10.5,
+      "editors": [
+        {
+          "width": 524.796875,
+          "height": 398.625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 745.203125,
+          "height": 398.625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 524.796875,
+          "height": 667.375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 745.203125,
+          "height": 667.375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 39,
+      "row": 38,
+      "appliedColumn": 39,
+      "appliedRow": 38,
+      "frameMs": 14.100000143051147,
+      "editors": [
+        {
+          "width": 499.1875,
+          "height": 409.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 770.8125,
+          "height": 409.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 499.1875,
+          "height": 656.640625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 770.8125,
+          "height": 656.640625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 38,
+      "row": 40,
+      "appliedColumn": 38,
+      "appliedRow": 40,
+      "frameMs": 11.700000047683716,
+      "editors": [
+        {
+          "width": 486.390625,
+          "height": 430.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 783.609375,
+          "height": 430.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 486.390625,
+          "height": 635.203125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 783.609375,
+          "height": 635.203125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 36,
+      "row": 42,
+      "appliedColumn": 36,
+      "appliedRow": 42,
+      "frameMs": 13.700000047683716,
+      "editors": [
+        {
+          "width": 460.796875,
+          "height": 452.234375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 809.203125,
+          "height": 452.234375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 460.796875,
+          "height": 613.765625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 809.203125,
+          "height": 613.765625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 35,
+      "row": 44,
+      "appliedColumn": 35,
+      "appliedRow": 44,
+      "frameMs": 8.199999809265137,
+      "editors": [
+        {
+          "width": 448,
+          "height": 473.671875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 822,
+          "height": 473.671875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 448,
+          "height": 592.328125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 822,
+          "height": 592.328125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 35,
+      "row": 46,
+      "appliedColumn": 35,
+      "appliedRow": 46,
+      "frameMs": 26.90000009536743,
+      "editors": [
+        {
+          "width": 448,
+          "height": 495.109375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 822,
+          "height": 495.109375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 448,
+          "height": 570.890625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 822,
+          "height": 570.890625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 34,
+      "row": 48,
+      "appliedColumn": 34,
+      "appliedRow": 48,
+      "frameMs": 16.5,
+      "editors": [
+        {
+          "width": 435.1875,
+          "height": 516.546875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 516.546875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 435.1875,
+          "height": 549.453125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 549.453125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 34,
+      "row": 50,
+      "appliedColumn": 34,
+      "appliedRow": 50,
+      "frameMs": 11.700000047683716,
+      "editors": [
+        {
+          "width": 435.1875,
+          "height": 538,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 538,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 435.1875,
+          "height": 528,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 528,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 34,
+      "row": 52,
+      "appliedColumn": 34,
+      "appliedRow": 52,
+      "frameMs": 15.200000047683716,
+      "editors": [
+        {
+          "width": 435.1875,
+          "height": 559.4375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 559.4375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 435.1875,
+          "height": 506.5625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 506.5625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 34,
+      "row": 54,
+      "appliedColumn": 34,
+      "appliedRow": 54,
+      "frameMs": 11.5,
+      "editors": [
+        {
+          "width": 435.1875,
+          "height": 580.875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 580.875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 435.1875,
+          "height": 485.125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 834.8125,
+          "height": 485.125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 35,
+      "row": 56,
+      "appliedColumn": 35,
+      "appliedRow": 56,
+      "frameMs": 12.400000095367432,
+      "editors": [
+        {
+          "width": 448,
+          "height": 602.3125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 822,
+          "height": 602.3125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 448,
+          "height": 463.6875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 822,
+          "height": 463.6875,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 36,
+      "row": 58,
+      "appliedColumn": 36,
+      "appliedRow": 58,
+      "frameMs": 11.399999856948853,
+      "editors": [
+        {
+          "width": 460.796875,
+          "height": 623.75,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 809.203125,
+          "height": 623.75,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 460.796875,
+          "height": 442.25,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 809.203125,
+          "height": 442.25,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 37,
+      "row": 60,
+      "appliedColumn": 37,
+      "appliedRow": 60,
+      "frameMs": 11.299999952316284,
+      "editors": [
+        {
+          "width": 473.59375,
+          "height": 645.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 796.40625,
+          "height": 645.1875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 473.59375,
+          "height": 420.8125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 796.40625,
+          "height": 420.8125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 39,
+      "row": 61,
+      "appliedColumn": 39,
+      "appliedRow": 61,
+      "frameMs": 15,
+      "editors": [
+        {
+          "width": 499.1875,
+          "height": 655.90625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 770.8125,
+          "height": 655.90625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 499.1875,
+          "height": 410.09375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 770.8125,
+          "height": 410.09375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 40,
+      "row": 63,
+      "appliedColumn": 40,
+      "appliedRow": 63,
+      "frameMs": 5.3999998569488525,
+      "editors": [
+        {
+          "width": 512,
+          "height": 677.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 758,
+          "height": 677.359375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 512,
+          "height": 388.640625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 758,
+          "height": 388.640625,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 42,
+      "row": 64,
+      "appliedColumn": 42,
+      "appliedRow": 64,
+      "frameMs": 27.90000009536743,
+      "editors": [
+        {
+          "width": 537.59375,
+          "height": 688.078125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 732.40625,
+          "height": 688.078125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 537.59375,
+          "height": 377.921875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 732.40625,
+          "height": 377.921875,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 44,
+      "row": 65,
+      "appliedColumn": 44,
+      "appliedRow": 65,
+      "frameMs": 15.299999952316284,
+      "editors": [
+        {
+          "width": 563.1875,
+          "height": 698.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 706.8125,
+          "height": 698.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 563.1875,
+          "height": 367.203125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 706.8125,
+          "height": 367.203125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 46,
+      "row": 65,
+      "appliedColumn": 46,
+      "appliedRow": 65,
+      "frameMs": 12.700000047683716,
+      "editors": [
+        {
+          "width": 588.796875,
+          "height": 698.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 681.203125,
+          "height": 698.796875,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 588.796875,
+          "height": 367.203125,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 681.203125,
+          "height": 367.203125,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 48,
+      "row": 66,
+      "appliedColumn": 48,
+      "appliedRow": 66,
+      "frameMs": 13.900000095367432,
+      "editors": [
+        {
+          "width": 614.390625,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 655.609375,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 614.390625,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 655.609375,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    },
+    {
+      "column": 50,
+      "row": 66,
+      "appliedColumn": 50,
+      "appliedRow": 66,
+      "frameMs": 10.799999952316284,
+      "editors": [
+        {
+          "width": 640,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 630,
+          "height": 709.515625,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 640,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        },
+        {
+          "width": 630,
+          "height": 356.484375,
+          "renderedLines": 20,
+          "visible": true
+        }
+      ],
+      "allEditorsVisible": true,
+      "totalRenderedLines": 80,
+      "domNodeCount": 1280,
+      "usedJSHeapSize": 31200000
+    }
+  ],
+  "longTasks": [],
+  "summary": {
+    "frameCount": 96,
+    "frameMs": {
+      "average": 13.47,
+      "p50": 12.6,
+      "p75": 15.4,
+      "p95": 27,
+      "p99": 27.9,
+      "max": 27.9,
+      "over16_7ms": 17,
+      "over33_3ms": 0,
+      "over50ms": 0
+    },
+    "longTasks": {
+      "count": 0,
+      "maxMs": 0,
+      "totalMs": 0
+    },
+    "renderedLines": {
+      "averageTotal": 80,
+      "maxTotal": 80
+    },
+    "domNodes": {
+      "max": 1280,
+      "average": 1280
+    },
+    "heap": {
+      "startMB": 29.75,
+      "endMB": 29.75,
+      "peakMB": 29.75
+    },
+    "visibility": {
+      "allEditorsVisibleFrames": 96,
+      "allEditorsVisibleRate": 1
+    },
+    "pageFailures": []
+  }
+}

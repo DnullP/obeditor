@@ -68,6 +68,67 @@ describe("createEditorService", () => {
     expect(service.getSnapshot().dirty).toBe(true);
   });
 
+  it("flushes attached editor content before saving", async () => {
+    const saved: string[] = [];
+    const service = createEditorService({
+      document: {
+        id: "demo",
+        content: "# Demo",
+      },
+      adapter: {
+        saveDocument: async (document) => {
+          saved.push(document.content);
+        },
+      },
+    });
+
+    service.attachView({} as never, {
+      contentSync: {
+        flushPendingContent: () => service.updateContent("# Demo\n\nLatest", "test-flush"),
+      },
+    });
+
+    await service.save();
+
+    expect(saved).toEqual(["# Demo\n\nLatest"]);
+  });
+
+  it("flushes attached editor content before mode switches and commands read the snapshot", async () => {
+    const service = createEditorService({
+      document: {
+        id: "demo",
+        content: "# Demo",
+      },
+      plugins: [{
+        id: "snapshot-reader",
+        setup() {
+          return {
+            commands: [{
+              id: "test.appendSnapshot",
+              label: "Append snapshot",
+              run: ({ document, updateContent }) => updateContent(`${document.content}\ncommand`, "command"),
+            }],
+          };
+        },
+      }],
+    });
+    let pendingContent = "# Demo\n\nFlushed";
+
+    service.attachView({} as never, {
+      contentSync: {
+        flushPendingContent: () => service.updateContent(pendingContent, "test-flush"),
+      },
+    });
+
+    service.setMode("read");
+    expect(service.getSnapshot().document.content).toBe("# Demo\n\nFlushed");
+
+    pendingContent = "# Demo\n\nFlushed again";
+    await service.executeCommand("test.appendSnapshot");
+
+    expect(service.getSnapshot().document.content).toBe("# Demo\n\nFlushed again\ncommand");
+  });
+
   it("loads documents through the host adapter", async () => {
     const service = createEditorService({
       adapter: {

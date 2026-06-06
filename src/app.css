@@ -93,14 +93,33 @@ textarea {
   font-size: 12px;
 }
 
-.demo-field select {
+.demo-field select,
+.demo-field input[type="range"] {
   width: 126px;
   height: 30px;
+}
+
+.demo-field select {
   border: 1px solid #cbd5e1;
   border-radius: 6px;
   padding: 0 8px;
   background: #ffffff;
   color: #1d2430;
+}
+
+.demo-field input[type="range"] {
+  accent-color: #1f65d6;
+}
+
+.demo-field-range {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 126px 34px;
+}
+
+.demo-field output {
+  color: #657386;
+  font-size: 12px;
+  text-align: right;
 }
 
 .demo-toggle {
@@ -139,9 +158,41 @@ textarea {
 }
 
 .demo-editor-frame {
+  display: flex;
+  align-items: stretch;
   min-width: 0;
   min-height: 0;
   padding: 14px;
+  overflow: hidden;
+}
+
+.demo-editor-stage {
+  width: var(--demo-editor-width, 100%);
+  max-width: 100%;
+  min-width: 320px;
+  min-height: 0;
+  height: 100%;
+}
+
+.demo-quad-editor-stage {
+  display: grid;
+  grid-template-columns: minmax(0, var(--demo-quad-column, 50%)) minmax(0, 1fr);
+  grid-template-rows: minmax(0, var(--demo-quad-row, 50%)) minmax(0, 1fr);
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  contain: layout style;
+}
+
+.demo-quad-editor-cell {
+  min-width: 0;
+  min-height: 0;
+}
+
+.demo-quad-editor-cell .oe-editor {
+  height: 100%;
 }
 
 .demo-editor-frame .oe-editor {
@@ -164,5 +215,16 @@ textarea {
 
   .demo-editor-frame {
     padding: 10px;
+  }
+
+  .demo-editor-stage {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .demo-quad-editor-stage {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, minmax(320px, 1fr));
+    overflow: auto;
   }
 }

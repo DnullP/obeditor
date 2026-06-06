@@ -47,6 +47,7 @@ export {
 } from "./core/defaultCapabilities";
 export type {
   EditorCommand,
+  EditorAttachedContentSync,
   EditorCommandContext,
   EditorCommandDescriptor,
   EditorDocument,

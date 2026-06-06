@@ -67,6 +67,7 @@ class EditorServiceImpl<
   private readonly pluginIds: string[] = [];
   private readonly disposers: Array<() => void> = [];
   private view: TView | null = null;
+  private flushAttachedContent: ((reason?: string) => void) | null = null;
   private cachedSnapshot: EditorSnapshot | null = null;
 
   constructor(options: EditorServiceOptions<TView, TExtension> = {}) {
@@ -105,6 +106,8 @@ class EditorServiceImpl<
   }
 
   async loadDocument(ref: EditorDocumentRef): Promise<void> {
+    this.flushPendingContent("load-document");
+
     if (!this.host.loadDocument) {
       this.setDocument({
         id: ref.id,
@@ -135,6 +138,8 @@ class EditorServiceImpl<
   }
 
   setDocument(document: Partial<EditorDocument> & Pick<EditorDocument, "content">): void {
+    this.flushPendingContent("set-document");
+
     this.document = this.normalizeLoadedDocument(document, document);
     this.status = "idle";
     this.error = null;
@@ -163,7 +168,13 @@ class EditorServiceImpl<
     this.emit();
   }
 
+  flushPendingContent(reason = "service"): void {
+    this.flushAttachedContent?.(reason);
+  }
+
   async save(): Promise<void> {
+    this.flushPendingContent("save");
+
     const savingVersion = this.document.version;
     this.status = "saving";
     this.error = null;
@@ -192,9 +203,11 @@ class EditorServiceImpl<
 
   setMode(mode: EditorMode): void {
     if (this.mode === mode) {
+      this.flushPendingContent(`mode:${mode}`);
       return;
     }
 
+    this.flushPendingContent(`mode:${mode}`);
     this.mode = mode;
     const snapshot = this.getSnapshot();
     this.host.onModeChanged?.(mode, snapshot);
@@ -202,6 +215,8 @@ class EditorServiceImpl<
   }
 
   async executeCommand(commandId: string): Promise<void> {
+    this.flushPendingContent(`command:${commandId}`);
+
     const command = this.commands.get(commandId);
     if (!command) {
       this.log("warn", "Editor command not found", { commandId });
@@ -237,17 +252,20 @@ class EditorServiceImpl<
 
   attachView(view: TView | null, options: EditorViewAttachOptions = {}): void {
     this.view = view;
+    this.flushAttachedContent = view ? options.contentSync?.flushPendingContent ?? null : null;
     if (view && options.notifyFocus !== false) {
       this.host.onDocumentFocused?.(this.document, this.getSnapshot());
     }
   }
 
   dispose(): void {
+    this.flushPendingContent("dispose");
     this.disposers.splice(0).reverse().forEach((dispose) => dispose());
     this.listeners.clear();
     this.commands.clear();
     this.codeMirrorExtensions.splice(0);
     this.view = null;
+    this.flushAttachedContent = null;
   }
 
   private installPlugins(plugins: Array<EditorPlugin<TView, TExtension>>): void {

@@ -45,6 +45,11 @@ export interface EditorSnapshot {
 
 export interface EditorViewAttachOptions {
   notifyFocus?: boolean;
+  contentSync?: EditorAttachedContentSync;
+}
+
+export interface EditorAttachedContentSync {
+  flushPendingContent: (reason?: string) => void;
 }
 
 export interface EditorHostAdapter {
@@ -135,6 +140,7 @@ export interface EditorService<
   loadDocument: (ref: EditorDocumentRef) => Promise<void>;
   setDocument: (document: Partial<EditorDocument> & Pick<EditorDocument, "content">) => void;
   updateContent: (content: string, reason?: string) => void;
+  flushPendingContent: (reason?: string) => void;
   save: () => Promise<void>;
   setMode: (mode: EditorMode) => void;
   executeCommand: (commandId: string) => Promise<void>;

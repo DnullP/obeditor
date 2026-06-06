@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   createDefaultEditorCapabilities,
   createDefaultMarkdownPlugins,
@@ -10,6 +10,18 @@ import {
 } from "./index";
 import "./styles/editor.css";
 import "./app.css";
+
+interface DemoRuntimeStats {
+  documentChangedCount: number;
+  lastContentLength: number;
+  lastDocumentId: string;
+}
+
+declare global {
+  interface Window {
+    __OBEDITOR_DEMO_STATS?: DemoRuntimeStats;
+  }
+}
 
 const demoContent = `---
 title: Plugin System
@@ -54,10 +66,11 @@ $$
 - [ ] Try Vim mode if you like modal editing.
 `;
 
-type DemoDocumentId = "plugin-system" | "large-table";
+type DemoDocumentId = "plugin-system" | "large-table" | "large-article";
+type DemoSelectionId = DemoDocumentId | "quad-large-articles";
 
 interface DemoDocumentDefinition {
-  id: DemoDocumentId;
+  id: string;
   path: string;
   title: string;
   content: string;
@@ -120,6 +133,76 @@ function createLargeTableDemoContent() {
 
 const largeTableDemoContent = createLargeTableDemoContent();
 
+function createLargeArticleDemoContent(
+  title = "Large Article Performance",
+  seed = 0,
+) {
+  const sections = Array.from({ length: 420 }, (_, index) => {
+    const sectionNumber = index + 1;
+    const padded = String(sectionNumber).padStart(3, "0");
+    const topics = ["state sync", "responsive layout", "index freshness", "plugin injection", "read mode"];
+    const topic = topics[(index + seed) % topics.length];
+    const checklist = sectionNumber % 7 === 0
+      ? [
+        "",
+        `- [ ] Verify checkpoint ${padded} keeps editing state local until the host needs a flush.`,
+        `- [ ] Confirm resize sampling for ${topic} does not blank the active viewport.`,
+      ]
+      : [];
+    const table = sectionNumber % 20 === 0
+      ? [
+        "",
+        "| Metric | Target | Observation |",
+        "| --- | --- | --- |",
+        `| Sync batch | <= 1 idle flush | Section ${padded} |`,
+        `| Resize frame | stable focus | ${topic} |`,
+      ]
+      : [];
+
+    return [
+      `## Section ${padded}: ${topic}`,
+      "",
+      `This large article paragraph keeps CodeMirror virtualization, markdown widgets, and host synchronization busy without requiring the demo host to reload the editor on every keystroke. It references [[Capability System]] and uses inline math $x_${sectionNumber}^2 + y_${sectionNumber}^2 = z_${sectionNumber}^2$ so syntax plugins still participate.`,
+      "",
+      `A second paragraph adds enough natural prose for wrapping while the editor width changes continuously. The important behavior is that the active document remains editable, selection and focus stay connected, and only explicit flush boundaries publish the full document to the host service.`,
+      ...checklist,
+      ...table,
+    ].join("\n");
+  });
+
+  return [
+    "---",
+    `title: ${title}`,
+    "tags:",
+    "  - demo",
+    "  - performance",
+    "  - large-article",
+    "---",
+    "",
+    `# ${title}`,
+    "",
+    "This document is intentionally long enough to exercise large-document editing, split/read rendering, and continuous responsive layout changes.",
+    "",
+    ...sections,
+    "",
+    "Final paragraph for end-of-document navigation and save flush checks.",
+  ].join("\n");
+}
+
+const largeArticleDemoContent = createLargeArticleDemoContent();
+
+const quadLargeArticleDocuments: DemoDocumentDefinition[] = Array.from({ length: 4 }, (_, index) => {
+  const number = index + 1;
+  const title = `Large Article Quadrant ${number}`;
+  return {
+    id: `quad-large-article-${number}`,
+    path: `${title}.md`,
+    title: `${title}.md`,
+    content: createLargeArticleDemoContent(title, index),
+    referenceCount: 21 + index,
+  };
+});
+
 const demoDocuments: Record<DemoDocumentId, DemoDocumentDefinition> = {
   "plugin-system": {
     id: "plugin-system",
@@ -135,20 +218,36 @@ const demoDocuments: Record<DemoDocumentId, DemoDocumentDefinition> = {
     content: largeTableDemoContent,
     referenceCount: 3,
   },
+  "large-article": {
+    id: "large-article",
+    path: "Large Article Performance.md",
+    title: "Large Article Performance.md",
+    content: largeArticleDemoContent,
+    referenceCount: 21,
+  },
 };
 
-const demoDocumentOptions: Array<{ value: DemoDocumentId; label: string }> = [
+const demoDocumentOptions: Array<{ value: DemoSelectionId; label: string }> = [
   { value: "plugin-system", label: "Plugin System" },
   { value: "large-table", label: "Large Table" },
+  { value: "large-article", label: "Large Article" },
+  { value: "quad-large-articles", label: "Quad Large Articles" },
 ];
 
-function resolveInitialDemoDocumentId(): DemoDocumentId {
+function isDemoDocumentId(value: DemoSelectionId): value is DemoDocumentId {
+  return value === "plugin-system" || value === "large-table" || value === "large-article";
+}
+
+function resolveInitialDemoSelectionId(): DemoSelectionId {
   if (typeof window === "undefined") {
     return "plugin-system";
   }
 
-  return new URLSearchParams(window.location.search).get("demo") === "large-table"
-    ? "large-table"
+  const requestedDemoId = new URLSearchParams(window.location.search).get("demo");
+  return requestedDemoId === "large-table"
+    || requestedDemoId === "large-article"
+    || requestedDemoId === "quad-large-articles"
+    ? requestedDemoId
     : "plugin-system";
 }
 
@@ -162,9 +261,25 @@ function createDemoEditorDocument(document: DemoDocumentDefinition) {
 }
 
 function resolveDemoDocumentReferenceCount(pathOrId: string | undefined) {
-  return Object.values(demoDocuments)
+  return [...Object.values(demoDocuments), ...quadLargeArticleDocuments]
     .find((document) => document.path === pathOrId || document.id === pathOrId)
     ?.referenceCount ?? 0;
+}
+
+function recordDemoDocumentChange(document: { id: string; content: string }) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const stats = window.__OBEDITOR_DEMO_STATS ?? {
+    documentChangedCount: 0,
+    lastContentLength: document.content.length,
+    lastDocumentId: document.id,
+  };
+  stats.documentChangedCount += 1;
+  stats.lastContentLength = document.content.length;
+  stats.lastDocumentId = document.id;
+  window.__OBEDITOR_DEMO_STATS = stats;
 }
 
 type DemoLineNumbersMode = CodeMirrorLineNumbersMode;
@@ -176,15 +291,22 @@ const lineNumberOptions: Array<{ value: DemoLineNumbersMode; label: string }> = 
 ];
 
 export function App() {
-  const initialDemoId = useMemo(() => resolveInitialDemoDocumentId(), []);
-  const [selectedDemoId, setSelectedDemoId] = useState<DemoDocumentId>(initialDemoId);
-  const activeDemoDocument = demoDocuments[selectedDemoId];
+  const initialSelectionId = useMemo(() => resolveInitialDemoSelectionId(), []);
+  const initialSingleDemoId = isDemoDocumentId(initialSelectionId) ? initialSelectionId : "large-article";
+  const [selectedDemoId, setSelectedDemoId] = useState<DemoSelectionId>(initialSelectionId);
+  const activeDemoDocument = isDemoDocumentId(selectedDemoId) ? demoDocuments[selectedDemoId] : null;
   const [lineNumbers, setLineNumbers] = useState<DemoLineNumbersMode>("absolute");
   const [vimMode, setVimMode] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
-  const [savedContent, setSavedContent] = useState(demoDocuments[initialDemoId].content);
+  const [savedContent, setSavedContent] = useState(demoDocuments[initialSingleDemoId].content);
   const [lastOpenedPath, setLastOpenedPath] = useState<string | null>(null);
   const [activeMode, setActiveMode] = useState<EditorMode>("edit");
+  const [editorWidthPercent, setEditorWidthPercent] = useState(100);
+  const [quadColumnPercent, setQuadColumnPercent] = useState(50);
+  const [quadRowPercent, setQuadRowPercent] = useState(50);
+  const runtimeSavedLength = selectedDemoId === "quad-large-articles"
+    ? quadLargeArticleDocuments.reduce((total, document) => total + document.content.length, 0)
+    : savedContent.length;
 
   const capabilities = useMemo(() => createDefaultEditorCapabilities({
     documents: [
@@ -206,6 +328,18 @@ export function App() {
         content: largeTableDemoContent,
         referenceCount: 3,
       },
+      {
+        path: "Large Article Performance.md",
+        title: "Large Article Performance",
+        content: largeArticleDemoContent,
+        referenceCount: 21,
+      },
+      ...quadLargeArticleDocuments.map((document) => ({
+        path: document.path,
+        title: document.title,
+        content: document.content,
+        referenceCount: document.referenceCount,
+      })),
     ],
     translations: {
       "editorPlugins.noMatchingNote": "No matching demo note",
@@ -230,6 +364,7 @@ export function App() {
       };
     },
     onDocumentChanged(document) {
+      recordDemoDocumentChange(document);
       capabilities.memory.upsertDocument({
         path: document.path ?? document.id,
         title: document.title,
@@ -246,12 +381,21 @@ export function App() {
   }), [capabilities]);
 
   const service = useMemo(() => createEditorService({
-    document: createDemoEditorDocument(demoDocuments[initialDemoId]),
+    document: createDemoEditorDocument(demoDocuments[initialSingleDemoId]),
     adapter,
     plugins: createDefaultMarkdownPlugins(),
-  }), [adapter, initialDemoId]);
+  }), [adapter, initialSingleDemoId]);
 
   useEffect(() => {
+    if (!activeDemoDocument) {
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.set("demo", selectedDemoId);
+        window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+      }
+      return;
+    }
+
     const nextDocument = createDemoEditorDocument(activeDemoDocument);
     const currentDocument = service.getSnapshot().document;
     if (
@@ -265,10 +409,10 @@ export function App() {
 
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
-      if (selectedDemoId === "large-table") {
-        url.searchParams.set("demo", "large-table");
-      } else {
+      if (selectedDemoId === "plugin-system") {
         url.searchParams.delete("demo");
+      } else {
+        url.searchParams.set("demo", selectedDemoId);
       }
       window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
     }
@@ -292,7 +436,7 @@ export function App() {
             <select
               aria-label="Demo note"
               value={selectedDemoId}
-              onChange={(event) => setSelectedDemoId(event.target.value as DemoDocumentId)}
+              onChange={(event) => setSelectedDemoId(event.target.value as DemoSelectionId)}
             >
               {demoDocumentOptions.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
@@ -310,6 +454,50 @@ export function App() {
               ))}
             </select>
           </label>
+          {selectedDemoId === "quad-large-articles" ? (
+            <>
+              <label className="demo-field demo-field-range">
+                <span>Column split</span>
+                <input
+                  aria-label="Quad column split"
+                  min="34"
+                  max="66"
+                  step="1"
+                  type="range"
+                  value={quadColumnPercent}
+                  onChange={(event) => setQuadColumnPercent(Number(event.target.value))}
+                />
+                <output>{quadColumnPercent}%</output>
+              </label>
+              <label className="demo-field demo-field-range">
+                <span>Row split</span>
+                <input
+                  aria-label="Quad row split"
+                  min="34"
+                  max="66"
+                  step="1"
+                  type="range"
+                  value={quadRowPercent}
+                  onChange={(event) => setQuadRowPercent(Number(event.target.value))}
+                />
+                <output>{quadRowPercent}%</output>
+              </label>
+            </>
+          ) : (
+            <label className="demo-field demo-field-range">
+              <span>Editor width</span>
+              <input
+                aria-label="Editor width"
+                min="46"
+                max="100"
+                step="1"
+                type="range"
+                value={editorWidthPercent}
+                onChange={(event) => setEditorWidthPercent(Number(event.target.value))}
+              />
+              <output>{editorWidthPercent}%</output>
+            </label>
+          )}
           <label className="demo-toggle">
             <input
               checked={vimMode}
@@ -336,7 +524,7 @@ export function App() {
           </div>
           <div className="demo-meter">
             <span>Saved</span>
-            <strong>{savedContent.length} chars</strong>
+            <strong>{runtimeSavedLength} chars</strong>
           </div>
           <div className="demo-meter">
             <span>Opened link</span>
@@ -346,13 +534,85 @@ export function App() {
       </aside>
 
       <section className="demo-editor-frame" aria-label="obeditor demo">
-        <UniversalMarkdownEditor
-          lineNumbers={lineNumbers}
-          readOnly={readOnly}
-          service={service}
-          vimMode={vimMode}
-        />
+        {selectedDemoId === "quad-large-articles" ? (
+          <QuadLargeArticlesDemo
+            adapter={adapter}
+            columnPercent={quadColumnPercent}
+            lineNumbers={lineNumbers}
+            readOnly={readOnly}
+            rowPercent={quadRowPercent}
+            vimMode={vimMode}
+          />
+        ) : (
+          <div
+            className="demo-editor-stage"
+            data-editor-width-percent={editorWidthPercent}
+            style={{ "--demo-editor-width": `${editorWidthPercent}%` } as CSSProperties}
+          >
+            <UniversalMarkdownEditor
+              lineNumbers={lineNumbers}
+              readOnly={readOnly}
+              service={service}
+              vimMode={vimMode}
+            />
+          </div>
+        )}
       </section>
     </main>
+  );
+}
+
+function QuadLargeArticlesDemo({
+  adapter,
+  columnPercent,
+  lineNumbers,
+  readOnly,
+  rowPercent,
+  vimMode,
+}: {
+  adapter: EditorHostAdapter;
+  columnPercent: number;
+  lineNumbers: DemoLineNumbersMode;
+  readOnly: boolean;
+  rowPercent: number;
+  vimMode: boolean;
+}) {
+  const services = useMemo(() => quadLargeArticleDocuments.map((document) =>
+    createEditorService({
+      document: createDemoEditorDocument(document),
+      adapter,
+      plugins: createDefaultMarkdownPlugins(),
+    })), [adapter]);
+
+  useEffect(() => () => {
+    services.forEach((service) => service.dispose());
+  }, [services]);
+
+  return (
+    <div
+      className="demo-quad-editor-stage"
+      data-quad-column-percent={columnPercent}
+      data-quad-row-percent={rowPercent}
+      style={{
+        "--demo-quad-column": `${columnPercent}%`,
+        "--demo-quad-row": `${rowPercent}%`,
+      } as CSSProperties}
+    >
+      {quadLargeArticleDocuments.map((document, index) => (
+        <section
+          key={document.id}
+          className="demo-quad-editor-cell"
+          aria-label={`Quad editor ${index + 1}`}
+          data-quad-editor-index={index}
+        >
+          <UniversalMarkdownEditor
+            lineNumbers={lineNumbers}
+            readOnly={readOnly}
+            service={services[index]!}
+            vimMode={vimMode}
+          />
+        </section>
+      ))}
+    </div>
   );
 }

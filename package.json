@@ -24,6 +24,7 @@
     "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json && vite build && node scripts/externalize-katex-css.mjs",
     "build:demo": "OBEDITOR_BUILD_TARGET=demo vite build --outDir demo-dist",
     "preview:demo": "vite preview --host 127.0.0.1 --port 4317 --strictPort --outDir demo-dist",
+    "perf:quad-editors": "node scripts/measure-quad-editor-performance.mjs",
     "prepare": "npm run build",
     "test": "bun test",
     "test:e2e": "bunx playwright test --config playwright.config.ts --reporter=line"
