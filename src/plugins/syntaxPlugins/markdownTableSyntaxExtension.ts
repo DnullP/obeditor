@@ -25,7 +25,11 @@ import {
 import { createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import type { EditorCapabilitiesSource } from "../../core/capabilities";
-import { translateEditorTextFromSource } from "../../core/capabilities";
+import {
+    resolveEditorCapabilities,
+    translateEditorTextFromSource,
+} from "../../core/capabilities";
+import type { EditorTextLayoutEstimator } from "../../core/textLayoutEstimator";
 import {
     parseMarkdownTableLayoutComment,
     parseMarkdownTableLines,
@@ -100,11 +104,13 @@ export { resolveMarkdownTableEditorWheelDeltaY };
 export function estimateMarkdownTableWidgetHeight(
     model: Pick<MarkdownTableModel, "rows">,
     layout: MarkdownTableLayout | null | undefined,
+    textLayoutEstimator?: EditorTextLayoutEstimator,
 ): number {
     return estimateMarkdownTableWidgetHeightFromModel(
         model,
         layout?.columnWidths,
         layout?.rowHeights,
+        textLayoutEstimator,
     );
 }
 
@@ -134,6 +140,12 @@ const markdownTableAtomicMarker = Decoration.mark({});
  */
 function isViewAlive(view: EditorView): boolean {
     return view.dom.isConnected;
+}
+
+function resolveMarkdownTableTextLayoutEstimator(
+    capabilities: EditorCapabilitiesSource,
+): EditorTextLayoutEstimator | undefined {
+    return resolveEditorCapabilities(capabilities)?.textLayout?.estimator;
 }
 
 /**
@@ -398,13 +410,21 @@ class MarkdownTableWidget extends WidgetType {
     }
 
     get estimatedHeight(): number {
-        return estimateMarkdownTableWidgetHeight(this.model, this.layout);
+        return estimateMarkdownTableWidgetHeight(
+            this.model,
+            this.layout,
+            resolveMarkdownTableTextLayoutEstimator(this.capabilities),
+        );
     }
 
     toDOM(view: EditorView): HTMLElement {
         const wrapper = document.createElement("section");
         wrapper.className = "cm-markdown-table-widget";
-        wrapper.style.minHeight = `${String(estimateMarkdownTableWidgetHeight(this.model, this.layout))}px`;
+        wrapper.style.minHeight = `${String(estimateMarkdownTableWidgetHeight(
+            this.model,
+            this.layout,
+            resolveMarkdownTableTextLayoutEstimator(this.capabilities),
+        ))}px`;
         const scrollDOM = view.scrollDOM;
         this.wheelForwarder = new MarkdownTableWheelForwarder({
             scrollTarget: scrollDOM,
@@ -492,11 +512,16 @@ function buildMarkdownTableDecorations(
     capabilities: EditorCapabilitiesSource,
 ): DecorationSet {
     const builder = new RangeSetBuilder<Decoration>();
+    const textLayoutEstimator = resolveMarkdownTableTextLayoutEstimator(capabilities);
 
     blocks.forEach((block) => {
         if (shouldKeepMarkdownTableSourceVisible(block, state.selection.ranges)) {
             const reserveDecoration = createSourceVisibleBlockReserveLineDecoration({
-                estimatedWidgetHeight: estimateMarkdownTableWidgetHeight(block.model, block.layout),
+                estimatedWidgetHeight: estimateMarkdownTableWidgetHeight(
+                    block.model,
+                    block.layout,
+                    textLayoutEstimator,
+                ),
                 sourceLineCount: block.endLineNumber - block.startLineNumber + 1,
             });
             if (reserveDecoration) {

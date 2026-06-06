@@ -60,15 +60,50 @@ function requestAnimationFrameCompat(callback: () => void): number | null {
 }
 
 function cancelAnimationFrameCompat(frameId: number | null): void {
-    if (
-        frameId === null ||
-        typeof window === "undefined" ||
-        typeof window.cancelAnimationFrame !== "function"
-    ) {
+    if (frameId === null) {
         return;
     }
 
-    window.cancelAnimationFrame(frameId);
+    if (typeof window !== "undefined" && typeof window.cancelAnimationFrame === "function") {
+        window.cancelAnimationFrame(frameId);
+        return;
+    }
+}
+
+const pendingBatchedMeasurements = new Set<() => void>();
+let batchedMeasurementFrameId: number | null = null;
+
+function flushBatchedMeasurements(): void {
+    const measurements = [...pendingBatchedMeasurements];
+    pendingBatchedMeasurements.clear();
+    batchedMeasurementFrameId = null;
+    measurements.forEach((measurement) => {
+        measurement();
+    });
+}
+
+function scheduleBatchedMeasurement(measurement: () => void): (() => void) | null {
+    pendingBatchedMeasurements.add(measurement);
+    if (batchedMeasurementFrameId === null) {
+        let flushedSynchronously = false;
+        const frameId = requestAnimationFrameCompat(() => {
+            flushedSynchronously = true;
+            flushBatchedMeasurements();
+        });
+        batchedMeasurementFrameId = flushedSynchronously ? null : frameId;
+    }
+
+    if (!pendingBatchedMeasurements.has(measurement)) {
+        return null;
+    }
+
+    return () => {
+        pendingBatchedMeasurements.delete(measurement);
+        if (pendingBatchedMeasurements.size === 0) {
+            cancelAnimationFrameCompat(batchedMeasurementFrameId);
+            batchedMeasurementFrameId = null;
+        }
+    };
 }
 
 export function createLayoutLightweightMeasurementController(
@@ -76,7 +111,7 @@ export function createLayoutLightweightMeasurementController(
 ): LayoutLightweightMeasurementController {
     let disposed = false;
     let pendingAfterLightweight = false;
-    let frameId: number | null = null;
+    let cancelScheduledMeasure: (() => void) | null = null;
     let forceNextFrame = false;
 
     const runMeasure = (): void => {
@@ -100,13 +135,13 @@ export function createLayoutLightweightMeasurementController(
         }
 
         forceNextFrame = forceNextFrame || force;
-        if (frameId !== null) {
+        if (cancelScheduledMeasure !== null) {
             return;
         }
 
-        frameId = requestAnimationFrameCompat(() => {
+        cancelScheduledMeasure = scheduleBatchedMeasurement(() => {
             const shouldForce = forceNextFrame;
-            frameId = null;
+            cancelScheduledMeasure = null;
             forceNextFrame = false;
             if (!shouldForce && isDocumentLayoutLightweight()) {
                 pendingAfterLightweight = true;
@@ -132,16 +167,16 @@ export function createLayoutLightweightMeasurementController(
                 return;
             }
 
-            cancelAnimationFrameCompat(frameId);
-            frameId = null;
+            cancelScheduledMeasure?.();
+            cancelScheduledMeasure = null;
             forceNextFrame = false;
             runMeasure();
         },
         dispose(): void {
             disposed = true;
             unsubscribe();
-            cancelAnimationFrameCompat(frameId);
-            frameId = null;
+            cancelScheduledMeasure?.();
+            cancelScheduledMeasure = null;
             forceNextFrame = false;
             pendingAfterLightweight = false;
         },

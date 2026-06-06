@@ -1,3 +1,5 @@
+import type { EditorTextLayoutEstimator } from "./textLayoutEstimator";
+
 export interface EditorLocalizationCapabilities {
   t: (key: string, options?: Record<string, unknown>, fallback?: string) => string;
 }
@@ -101,6 +103,10 @@ export interface EditorTextSegmentationContext {
   currentFilePath?: string;
 }
 
+export interface EditorTextLayoutCapabilities {
+  estimator: EditorTextLayoutEstimator;
+}
+
 export interface EditorContextMenuItem {
   id: string;
   text: string;
@@ -127,6 +133,7 @@ export interface EditorHostCapabilities {
   wikiLinks?: EditorWikiLinkCapabilities;
   mediaEmbeds?: EditorMediaEmbedCapabilities;
   textSegmentation?: EditorTextSegmentationCapabilities;
+  textLayout?: EditorTextLayoutCapabilities;
   contextMenu?: EditorContextMenuCapabilities;
   openExternalLink?: (url: string) => Promise<void> | void;
 }

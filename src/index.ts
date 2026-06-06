@@ -11,6 +11,7 @@ export type {
   EditorTextSegmentationCapabilities,
   EditorTextSegmentationContext,
   EditorTextSegment,
+  EditorTextLayoutCapabilities,
   EditorCapabilitiesSource,
   EditorContextMenuCapabilities,
   EditorContextMenuItem,
@@ -101,6 +102,18 @@ export type {
   CreateEditorChineseSegmentationControllerOptions,
   EditorChineseSegmentationController,
 } from "./core/editorChineseSegmentation";
+export {
+  createDefaultTextLayoutEstimator,
+  defaultTextLayoutEstimator,
+} from "./core/textLayoutEstimator";
+export type {
+  DefaultTextLayoutEstimatorOptions,
+  EditorTextLayoutEstimate,
+  EditorTextLayoutEstimateRequest,
+  EditorTextLayoutEstimator,
+  EditorTextWhiteSpace,
+  EditorTextWordBreak,
+} from "./core/textLayoutEstimator";
 export {
   findEditorTabOutTarget,
   createEditorTabOutKeymap,

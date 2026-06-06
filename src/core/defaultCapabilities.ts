@@ -10,6 +10,10 @@ import {
   type EditorWikiLinkSuggestionItem,
   type EditorWikiLinkTargetContext,
 } from "./capabilities";
+import {
+  createDefaultTextLayoutEstimator,
+  type EditorTextLayoutEstimator,
+} from "./textLayoutEstimator";
 
 export interface DefaultEditorMemoryDocument {
   path: string;
@@ -31,6 +35,7 @@ export interface DefaultEditorCapabilitiesOptions {
   documents?: DefaultEditorMemoryDocument[];
   assets?: DefaultEditorMemoryAsset[];
   translations?: Record<string, string>;
+  textLayoutEstimator?: EditorTextLayoutEstimator;
   openExternalLink?: (url: string) => Promise<void> | void;
   onOpenWikiLink?: (target: EditorWikiLinkResolvedTarget) => Promise<void> | void;
   showContextMenu?: (
@@ -151,6 +156,7 @@ export function createDefaultEditorCapabilities(
   const documents = createDocumentStore(options.documents ?? []);
   const assets = createAssetStore(options.assets ?? []);
   const registry = createEditorCapabilityRegistry();
+  const textLayoutEstimator = options.textLayoutEstimator ?? createDefaultTextLayoutEstimator();
 
   const capabilities: DefaultEditorCapabilities = {
     localization: {
@@ -166,6 +172,9 @@ export function createDefaultEditorCapabilities(
       show(items, trigger) {
         return options.showContextMenu?.(items, trigger) ?? createFallbackContextMenu(items);
       },
+    },
+    textLayout: {
+      estimator: textLayoutEstimator,
     },
     openExternalLink: options.openExternalLink ?? ((url) => {
       if (typeof window !== "undefined") {

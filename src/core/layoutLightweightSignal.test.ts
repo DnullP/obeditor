@@ -190,6 +190,63 @@ describe("layoutLightweightSignal", () => {
         controller.dispose();
     });
 
+    test("batches multiple controllers into one shared animation frame", () => {
+        const root = new DocumentElementStub();
+        installDocumentStub(root);
+        const animationFrames = installAnimationFrameStub();
+        let firstMeasureCount = 0;
+        let secondMeasureCount = 0;
+
+        const firstController = createLayoutLightweightMeasurementController(() => {
+            firstMeasureCount += 1;
+        });
+        const secondController = createLayoutLightweightMeasurementController(() => {
+            secondMeasureCount += 1;
+        });
+
+        firstController.request();
+        secondController.request();
+
+        expect(animationFrames.pendingFrameCount()).toBe(1);
+
+        animationFrames.flushNextFrame();
+
+        expect(firstMeasureCount).toBe(1);
+        expect(secondMeasureCount).toBe(1);
+        expect(animationFrames.pendingFrameCount()).toBe(0);
+
+        firstController.dispose();
+        secondController.dispose();
+    });
+
+    test("disposing one batched controller keeps sibling measurements scheduled", () => {
+        const root = new DocumentElementStub();
+        installDocumentStub(root);
+        const animationFrames = installAnimationFrameStub();
+        let firstMeasureCount = 0;
+        let secondMeasureCount = 0;
+
+        const firstController = createLayoutLightweightMeasurementController(() => {
+            firstMeasureCount += 1;
+        });
+        const secondController = createLayoutLightweightMeasurementController(() => {
+            secondMeasureCount += 1;
+        });
+
+        firstController.request();
+        secondController.request();
+        firstController.dispose();
+
+        expect(animationFrames.pendingFrameCount()).toBe(1);
+
+        animationFrames.flushNextFrame();
+
+        expect(firstMeasureCount).toBe(0);
+        expect(secondMeasureCount).toBe(1);
+
+        secondController.dispose();
+    });
+
     test("drops pending lightweight measurements after dispose", () => {
         const root = new DocumentElementStub();
         installDocumentStub(root);

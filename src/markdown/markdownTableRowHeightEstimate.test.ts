@@ -9,6 +9,7 @@ import {
     estimateMarkdownTableRowHeight,
     normalizeMarkdownTableCellLayoutText,
 } from "./markdownTableRowHeightEstimate";
+import type { EditorTextLayoutEstimator } from "../core/textLayoutEstimator";
 
 describe("markdown table row height estimate", () => {
     test("reflows row height when a column becomes narrower", () => {
@@ -52,5 +53,18 @@ describe("markdown table row height estimate", () => {
 
         expect(height).toBeGreaterThan(38);
         expect(height).toBe(estimateMarkdownTableRowHeight(rows[0] ?? [], [90, 164]));
+    });
+
+    test("accepts injected text layout estimators for host-tuned measurement", () => {
+        const estimator: EditorTextLayoutEstimator = {
+            estimate: ({ text }) => ({
+                height: text.includes("tall") ? 128 : 38,
+                lineCount: text.includes("tall") ? 6 : 1,
+                maxLineWidth: 80,
+                contentWidth: 80,
+            }),
+        };
+
+        expect(estimateMarkdownTableRowHeight(["plain", "tall content"], [164, 164], estimator)).toBe(128);
     });
 });

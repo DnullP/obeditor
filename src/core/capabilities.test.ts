@@ -92,4 +92,26 @@ describe("editor capabilities", () => {
       base64Content: "aGVsbG8=",
     });
   });
+
+  it("provides default text layout estimation for demo and mock hosts", () => {
+    const capabilities = createDefaultEditorCapabilities();
+    const wide = capabilities.textLayout?.estimator.estimate({
+      text: "Markdown table cells should reflow as the editor resizes.",
+      maxWidth: 420,
+      lineHeight: 18,
+      whiteSpace: "pre-wrap",
+      wordBreak: "break-word",
+    });
+    const narrow = capabilities.textLayout?.estimator.estimate({
+      text: "Markdown table cells should reflow as the editor resizes.",
+      maxWidth: 96,
+      lineHeight: 18,
+      whiteSpace: "pre-wrap",
+      wordBreak: "break-word",
+    });
+
+    expect(wide).toBeDefined();
+    expect(narrow).toBeDefined();
+    expect(narrow?.height).toBeGreaterThan(wide?.height ?? 0);
+  });
 });
